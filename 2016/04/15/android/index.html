@@ -1,0 +1,827 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Android,坐标," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文由文末的参考链接整理、整合、修改而成  1. 电子地图坐标系统简介 WGS-84 坐标系：即地球坐标系，国际经纬度坐标标准 GCJ-02 坐标系：即火星坐标系，WGS84 坐标系经加密后的坐标系，国测局制定。 BD-09 坐标系：即百度坐标系，GCJ02 坐标系经加密后的坐标系。  GCJ-02 坐标系统，就是在标准的 WGS-84 坐标系统上进行了人为的偏移，比如 Google 地图、腾讯">
+<meta name="keywords" content="Java,Android,坐标">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「转」电子地图坐标系统研究整理">
+<meta property="og:url" content="http://bitky.cc/2016/04/15/android/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="本文由文末的参考链接整理、整合、修改而成  1. 电子地图坐标系统简介 WGS-84 坐标系：即地球坐标系，国际经纬度坐标标准 GCJ-02 坐标系：即火星坐标系，WGS84 坐标系经加密后的坐标系，国测局制定。 BD-09 坐标系：即百度坐标系，GCJ02 坐标系经加密后的坐标系。  GCJ-02 坐标系统，就是在标准的 WGS-84 坐标系统上进行了人为的偏移，比如 Google 地图、腾讯">
+<meta property="og:updated_time" content="2017-04-09T05:14:27.213Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="「转」电子地图坐标系统研究整理">
+<meta name="twitter:description" content="本文由文末的参考链接整理、整合、修改而成  1. 电子地图坐标系统简介 WGS-84 坐标系：即地球坐标系，国际经纬度坐标标准 GCJ-02 坐标系：即火星坐标系，WGS84 坐标系经加密后的坐标系，国测局制定。 BD-09 坐标系：即百度坐标系，GCJ02 坐标系经加密后的坐标系。  GCJ-02 坐标系统，就是在标准的 WGS-84 坐标系统上进行了人为的偏移，比如 Google 地图、腾讯">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2016/04/15/android/"/>
+
+
+
+
+
+  <title> 「转」电子地图坐标系统研究整理 | 比特麒麟 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/04/15/android/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                「转」电子地图坐标系统研究整理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-15T12:57:47+08:00">
+                2016-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/其他/" itemprop="url" rel="index">
+                    <span itemprop="name">其他</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>本文由文末的参考链接整理、整合、修改而成</p>
+</blockquote>
+<h1 id="1-电子地图坐标系统简介"><a href="#1-电子地图坐标系统简介" class="headerlink" title="1. 电子地图坐标系统简介"></a>1. 电子地图坐标系统简介</h1><ul>
+<li>WGS-84 坐标系：即地球坐标系，国际经纬度坐标标准</li>
+<li>GCJ-02 坐标系：即火星坐标系，WGS84 坐标系经加密后的坐标系，国测局制定。</li>
+<li>BD-09 坐标系：即百度坐标系，GCJ02 坐标系经加密后的坐标系。</li>
+</ul>
+<p>GCJ-02 坐标系统，就是在标准的 WGS-84 坐标系统上进行了人为的偏移，比如 Google 地图、腾讯 SOSO 地图等就是直接使用了国家 GCJ-02 坐标系统，我们有一个不成文的说法，前者叫地球坐标，后者叫火星坐标，并且，火星坐标是无法转换成地球坐标的「网上虽然有一定的方法，但基本上都是基于偏移数据库，精度较高的数据库需要购买，当然这都是一种破解手段」。</p>
+<p>所有的电子地图、导航设备，都需要加入国家保密插件。第一步，地图公司测绘地图，测绘完成后，送到国家测绘局，将真实坐标的电子地图，加密成“火星坐标”，这样的地图才是可以出版和发布的，然后才可以让 GPS 公司处理。第二步，所有的 GPS 公司，只要需要汽车导航的，需要用到导航电子地图的，都需要在软件中加入国家保密算法，将 COM 口读出来的真实的坐标信号，加密转换成国家要求的保密的坐标。这样，GPS 导航仪和导航电子地图就可以完全匹配，GPS 也就可以正常工作了。</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th style="text-align:center">坐标系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>百度地图 API</td>
+<td style="text-align:center">百度坐标</td>
+</tr>
+<tr>
+<td>腾讯搜搜地图 API</td>
+<td style="text-align:center">火星坐标</td>
+</tr>
+<tr>
+<td>搜狐搜狗地图 API</td>
+<td style="text-align:center"><strong>搜狗坐标</strong></td>
+</tr>
+<tr>
+<td>阿里云地图 API</td>
+<td style="text-align:center">火星坐标</td>
+</tr>
+<tr>
+<td>图吧 MapBar 地图 API</td>
+<td style="text-align:center">图吧坐标</td>
+</tr>
+<tr>
+<td>高德 MapABC 地图 API</td>
+<td style="text-align:center">火星坐标</td>
+</tr>
+<tr>
+<td>灵图 51ditu 地图 API</td>
+<td style="text-align:center">火星坐标</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>注1：百度地图使用百度坐标，支持从地球坐标和火星坐标导入成百度坐标，但无法导出。并且批量坐标转换一次只能转换20个(待验证)。</li>
+<li>注2：搜狗地图支持直接显示地球坐标，支持地球坐标、火星坐标、百度坐标导入成搜狗坐标，同样，搜狗坐标也无法导出。</li>
+</ul>
+<p>说完坐标系统，我们自然能够知道这里的问题，通过以下问题，来说说我对此的研究。</p>
+<h1 id="2、各个坐标系的相互转换"><a href="#2、各个坐标系的相互转换" class="headerlink" title="2、各个坐标系的相互转换"></a>2、各个坐标系的相互转换</h1><h2 id="2-1-火星坐标系「GCJ-02」与百度坐标系「BD-09」的转换算法"><a href="#2-1-火星坐标系「GCJ-02」与百度坐标系「BD-09」的转换算法" class="headerlink" title="2.1 火星坐标系「GCJ-02」与百度坐标系「BD-09」的转换算法"></a>2.1 火星坐标系「GCJ-02」与百度坐标系「BD-09」的转换算法</h2><p>其中 bd_encrypt 将 GCJ-02 坐标转换成 BD-09 坐标， bd_decrypt 反之。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">void bd_encrypt(double gg_lat, double gg_lon, double &amp;bd_lat, double &amp;bd_lon)  </div><div class="line">&#123;  </div><div class="line">    double x = gg_lon, y = gg_lat;  </div><div class="line">    double z = sqrt(x * x + y * y) + 0.00002 * sin(y * x_pi);  </div><div class="line">    double theta = atan2(y, x) + 0.000003 * cos(x * x_pi);  </div><div class="line">    bd_lon = z * cos(theta) + 0.0065;  </div><div class="line">    bd_lat = z * sin(theta) + 0.006;  </div><div class="line">&#125;  </div><div class="line">void bd_decrypt(double bd_lat, double bd_lon, double &amp;gg_lat, double &amp;gg_lon)  </div><div class="line">&#123;  </div><div class="line">    double x = bd_lon - 0.0065, y = bd_lat - 0.006;  </div><div class="line">    double z = sqrt(x * x + y * y) - 0.00002 * sin(y * x_pi);  </div><div class="line">    double theta = atan2(y, x) - 0.000003 * cos(x * x_pi);  </div><div class="line">    gg_lon = z * cos(theta);  </div><div class="line">    gg_lat = z * sin(theta);  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="2-2-地球坐标系「WGS-84」到火星坐标系「GCJ-02」的转换算法"><a href="#2-2-地球坐标系「WGS-84」到火星坐标系「GCJ-02」的转换算法" class="headerlink" title="2.2 地球坐标系「WGS-84」到火星坐标系「GCJ-02」的转换算法"></a>2.2 地球坐标系「WGS-84」到火星坐标系「GCJ-02」的转换算法</h2><p>WGS-84 到 GCJ-02 的转换「即 GPS 加偏」算法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div></pre></td><td class="code"><pre><div class="line">using System;   </div><div class="line">namespace Navi  </div><div class="line">&#123;  </div><div class="line">    class EvilTransform  </div><div class="line">    &#123;  </div><div class="line">        const double pi = 3.14159265358979324;  </div><div class="line">        //   </div><div class="line">        // Krasovsky 1940   </div><div class="line">        //   </div><div class="line">        // a = 6378245.0, 1/f = 298.3   </div><div class="line">        // b = a * (1 - f)   </div><div class="line">        // ee = (a^2 - b^2) / a^2;   </div><div class="line">        const double a = 6378245.0;  </div><div class="line">        const double ee = 0.00669342162296594323;  </div><div class="line">        //   </div><div class="line">        // World Geodetic System ==&gt; Mars Geodetic System   </div><div class="line">        public static void transform(double wgLat, double wgLon, out double mgLat, out double mgLon)  </div><div class="line">        &#123;  </div><div class="line">            if (outOfChina(wgLat, wgLon))  </div><div class="line">            &#123;  </div><div class="line">                mgLat = wgLat;  </div><div class="line">                mgLon = wgLon;  </div><div class="line">                return;  </div><div class="line">            &#125;  </div><div class="line">            double dLat = transformLat(wgLon - 105.0, wgLat - 35.0);  </div><div class="line">            double dLon = transformLon(wgLon - 105.0, wgLat - 35.0);  </div><div class="line">            double radLat = wgLat / 180.0 * pi;  </div><div class="line">            double magic = Math.Sin(radLat);  </div><div class="line">            magic = 1 - ee * magic * magic;  </div><div class="line">            double sqrtMagic = Math.Sqrt(magic);  </div><div class="line">            dLat = (dLat * 180.0) / ((a * (1 - ee)) / (magic * sqrtMagic) * pi);  </div><div class="line">            dLon = (dLon * 180.0) / (a / sqrtMagic * Math.Cos(radLat) * pi);  </div><div class="line">            mgLat = wgLat + dLat;  </div><div class="line">            mgLon = wgLon + dLon;  </div><div class="line">        &#125;  </div><div class="line">        static bool outOfChina(double lat, double lon)  </div><div class="line">        &#123;  </div><div class="line">            if (lon &lt; 72.004 || lon &gt; 137.8347)  </div><div class="line">                return true;  </div><div class="line">            if (lat &lt; 0.8293 || lat &gt; 55.8271)  </div><div class="line">                return true;  </div><div class="line">            return false;  </div><div class="line">        &#125;  </div><div class="line">        static double transformLat(double x, double y)  </div><div class="line">        &#123;  </div><div class="line">            double ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.Sqrt(Math.Abs(x));  </div><div class="line">            ret += (20.0 * Math.Sin(6.0 * x * pi) + 20.0 * Math.Sin(2.0 * x * pi)) * 2.0 / 3.0;  </div><div class="line">            ret += (20.0 * Math.Sin(y * pi) + 40.0 * Math.Sin(y / 3.0 * pi)) * 2.0 / 3.0;  </div><div class="line">            ret += (160.0 * Math.Sin(y / 12.0 * pi) + 320 * Math.Sin(y * pi / 30.0)) * 2.0 / 3.0;  </div><div class="line">            return ret;  </div><div class="line">        &#125;  </div><div class="line">        static double transformLon(double x, double y)  </div><div class="line">        &#123;  </div><div class="line">            double ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.Sqrt(Math.Abs(x));  </div><div class="line">            ret += (20.0 * Math.Sin(6.0 * x * pi) + 20.0 * Math.Sin(2.0 * x * pi)) * 2.0 / 3.0;  </div><div class="line">            ret += (20.0 * Math.Sin(x * pi) + 40.0 * Math.Sin(x / 3.0 * pi)) * 2.0 / 3.0;  </div><div class="line">            ret += (150.0 * Math.Sin(x / 12.0 * pi) + 300.0 * Math.Sin(x / 30.0 * pi)) * 2.0 / 3.0;  </div><div class="line">            return ret;  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>以上参考自：<a href="http://www.xue5.com/Mobile/iOS/679842.html" target="_blank" rel="external">http://www.xue5.com/Mobile/iOS/679842.html</a></p>
+<h2 id="2-3-百度在线转换API"><a href="#2-3-百度在线转换API" class="headerlink" title="2.3 百度在线转换API"></a>2.3 百度在线转换API</h2><blockquote>
+<p><a href="http://api.map.baidu.com/ag/coord/convert?from=0&amp;to=4&amp;x=longitude&amp;y=latitude" target="_blank" rel="external">http://api.map.baidu.com/ag/coord/convert?from=0&amp;to=4&amp;x=longitude&amp;y=latitude</a><br>from: 来源坐标系「0 表示 WGS-84 坐标；2 表示GCJ-02 坐标」<br>to: 转换后的坐标「4 表示 BD-09 坐标，即百度地图使用的行」<br>x: 经度<br>y: 纬度  </p>
+</blockquote>
+<p>请求之后会返回一串 Json</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&#123;  </div><div class="line">    &quot;error&quot;:0,  </div><div class="line">    &quot;x&quot;:&quot;MTIxLjUwMDIyODIxNDk2&quot;,  </div><div class="line">    &quot;y&quot;:&quot;MzEuMjM1ODUwMjYwMTE3&quot;  </div><div class="line">&#125;  </div><div class="line">error：是结果是否出错标志位，0 表示成功</div><div class="line">x: 坐标系 2 时为经度，4 时为纬度(Base64编码)</div><div class="line">y: 坐标系 4 时为经度，2 时为纬度(Base64编码)</div><div class="line">``` </div><div class="line">什么情况，经纬度居然还加密？那接下来也只好见招拆招了</div></pre></td></tr></table></figure>
+<p>import java.io.BufferedReader;<br>import java.io.IOException;<br>import java.io.InputStream;<br>import java.io.InputStreamReader;<br>import java.io.OutputStreamWriter;<br>import java.net.URL;<br>import java.net.URLConnection;<br>import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;<br>public class BaiduAPIConverter extends Thread {<br>  public static void testPost(String x, String y) throws IOException {<br>    try {<br>      URL url = new URL(“<a href="http://api.map.baidu.com/ag/coord/convert?from=2&amp;to=4&amp;x=&quot;+" target="_blank" rel="external">http://api.map.baidu.com/ag/coord/convert?from=2&amp;to=4&amp;x=&quot;+</a> x + “&amp;y=” + y);<br>      URLConnection connection = url.openConnection();<br>      connection.setDoOutput(true);<br>      OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), “utf-8”);<br>      // remember to clean up<br>      out.flush();<br>      out.close();<br>      // 一旦发送成功，用以下方法就可以得到服务器的回应：<br>      String sCurrentLine, sTotalString;<br>      sCurrentLine = sTotalString = “”;<br>      InputStream l_urlStream;<br>      l_urlStream = connection.getInputStream();<br>      BufferedReader l_reader = new BufferedReader(new InputStreamReader(l_urlStream));<br>      while ((sCurrentLine = l_reader.readLine()) != null) {<br>        if (!sCurrentLine.equals(“”))<br>          sTotalString += sCurrentLine;<br>      }<br>      sTotalString = sTotalString.substring(1, sTotalString.length() - 1);<br>      String[] results = sTotalString.split(“\,”);<br>      if (results.length == 3) {<br>        if (results[0].split(“\:”)[1].equals(“0”)) {<br>          String mapX = results[1].split(“\:”)[1];<br>          String mapY = results[2].split(“\:”)[1];<br>          mapX = mapX.substring(1, mapX.length() - 1);<br>          mapY = mapY.substring(1, mapY.length() - 1);<br>          mapX = new String(Base64.decode(mapX));<br>          mapY = new String(Base64.decode(mapY));<br>          System.out.println(“\t” + mapX + “\t” + mapY);<br>        }<br>      }<br>     sleep(10000);<br>    } catch (InterruptedException e) {<br>      // TODO Auto-generated catch block<br>      e.printStackTrace();<br>    }<br>  }<br>  /** </p>
+<ul>
+<li>@param args </li>
+<li>@throws IOException<br>*/<br>public static void main(String[] args) throws IOException {<br>testPost(“120.151379”, “30.184678”);<br>System.out.println(“ok”);<br>}<br>}  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">到这里也差不多好了，主要的代码都写出来了，其他的您就自己写吧。</div><div class="line">以上参考自：http://scalpel.me/archives/136</div><div class="line"></div><div class="line">## 2.4 百度内置转换方法，可以不局限于百度定位 SDK</div><div class="line"></div><div class="line">在百度地图中取得 WGS-84 坐标，调用如下方法：</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>BMapManager.getLocationManager().setLocationCoordinateType(MKLocationManager.MK_COORDINATE_WGS84);<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">这样从百度 API 中取得的坐标就是 WGS-84 了，可是这种坐标如果显示到百度地图上就会偏移，也就是说取出一个坐标，原封不动的显示上去就偏移了，所以为了显示也是正常就需要在绘制到百度地图上之前转换成 BD-09 。</div><div class="line">转换成 BD-09，调用方法：</div></pre></td></tr></table></figure></p>
+<p>GeoPoint wgs84;<br>GeoPoint bd09= CoordinateConvert.bundleDecode(CoordinateConvert.fromWgs84ToBaidu(wgs84))；<br>```</p>
+<p>这里实在不明白为何要设计成 CoordinateConvert.fromWgs84ToBaidu(wgs84) 返回了一个 Bundle，所以还需要 CoordinateConvert.bundleDecode() 再转成 GeoPoint 。</p>
+<h1 id="3-参考文章"><a href="#3-参考文章" class="headerlink" title="3. 参考文章"></a>3. 参考文章</h1><ol>
+<li><a href="http://blog.csdn.net/findsafety/article/details/12442639" target="_blank" rel="external">国内各地图API坐标系统比较与转换</a></li>
+<li><a href="http://rovertang.com/about-baidu-map-coordinate-conversion-interface/" target="_blank" rel="external">关于百度地图坐标转换接口的研究</a></li>
+<li><a href="http://blog.csdn.net/gatr/article/details/21520737" target="_blank" rel="external">构建自己的百度地图坐标纠偏数据库 </a></li>
+<li><a href="http://blog.csdn.net/junfeng120125/article/details/9966857" target="_blank" rel="external">GPS纠偏算法，适用于google,高德体系的地图 </a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/坐标/" rel="tag"># 坐标</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/15/sublime/" rel="next" title="Sublime Text 3 基本配置教程">
+                <i class="fa fa-chevron-left"></i> Sublime Text 3 基本配置教程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/15/device/" rel="prev" title="「转」识别独立安卓设备">
+                「转」识别独立安卓设备 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-csdn"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-电子地图坐标系统简介"><span class="nav-number">1.</span> <span class="nav-text">1. 电子地图坐标系统简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2、各个坐标系的相互转换"><span class="nav-number">2.</span> <span class="nav-text">2、各个坐标系的相互转换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-火星坐标系「GCJ-02」与百度坐标系「BD-09」的转换算法"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 火星坐标系「GCJ-02」与百度坐标系「BD-09」的转换算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-地球坐标系「WGS-84」到火星坐标系「GCJ-02」的转换算法"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 地球坐标系「WGS-84」到火星坐标系「GCJ-02」的转换算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-百度在线转换API"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 百度在线转换API</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-参考文章"><span class="nav-number">3.</span> <span class="nav-text">3. 参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C#,.NET,WPF,GUI," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文主要总结使用 C# 及 .NET 在 WPF 框架下，自定义控件的绘制以及窗体中控件的自适应。 1. WPF 下的自定义控件WPF 下，为快速地为应用定制一个零部件，需要的是 UserControl , 为了让你打造的控件更标准化，更灵活以及更具有普遍意义，需要用到的 CustomControl 。要在 WPF 中自定义一个控件,使用 UserControl 与 CustomControl 都">
+<meta name="keywords" content="C#,.NET,WPF,GUI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WPF 下的自定义控件以及 Grid 中控件的自适应">
+<meta property="og:url" content="http://bitky.cc/2016/10/12/wpf/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="本文主要总结使用 C# 及 .NET 在 WPF 框架下，自定义控件的绘制以及窗体中控件的自适应。 1. WPF 下的自定义控件WPF 下，为快速地为应用定制一个零部件，需要的是 UserControl , 为了让你打造的控件更标准化，更灵活以及更具有普遍意义，需要用到的 CustomControl 。要在 WPF 中自定义一个控件,使用 UserControl 与 CustomControl 都">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-b89696c7b86cd46b.jpg">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-607919602e2478ec.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-c1ad801a4c8c79d7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-6a4dcec3f0d97cef.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-c2fd2edee0471def.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-10b96a23b3f1c847.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-d9a008db596baf6d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-04-09T05:28:11.487Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WPF 下的自定义控件以及 Grid 中控件的自适应">
+<meta name="twitter:description" content="本文主要总结使用 C# 及 .NET 在 WPF 框架下，自定义控件的绘制以及窗体中控件的自适应。 1. WPF 下的自定义控件WPF 下，为快速地为应用定制一个零部件，需要的是 UserControl , 为了让你打造的控件更标准化，更灵活以及更具有普遍意义，需要用到的 CustomControl 。要在 WPF 中自定义一个控件,使用 UserControl 与 CustomControl 都">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-b89696c7b86cd46b.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2016/10/12/wpf/"/>
+
+
+
+
+
+  <title> WPF 下的自定义控件以及 Grid 中控件的自适应 | 比特麒麟 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/10/12/wpf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                WPF 下的自定义控件以及 Grid 中控件的自适应
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-12T12:57:47+08:00">
+                2016-10-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index">
+                    <span itemprop="name">C#</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文主要总结使用 C# 及 .NET 在 WPF 框架下，自定义控件的绘制以及窗体中控件的自适应。</p>
+<h1 id="1-WPF-下的自定义控件"><a href="#1-WPF-下的自定义控件" class="headerlink" title="1. WPF 下的自定义控件"></a>1. WPF 下的自定义控件</h1><p>WPF 下，为快速地为应用定制一个零部件，需要的是 UserControl , 为了让你打造的控件更标准化，更灵活以及更具有普遍意义，需要用到的 CustomControl 。要在 WPF 中自定义一个控件,使用 UserControl 与 CustomControl 都是不错的选择，他们的区别在于：</p>
+<ul>
+<li><p>UserControl , 其更像 WinForm 中自定义控件的开发风格，在开发上更简单快速，几乎可以简单地理解为：利用设计器来将多个已有控件作为子元素来拼凑成一个 UserControl 并修改其外观，然后后台逻辑代码直接访问这些子元素。其最大的弊端在于: 其对模板样式等支持度不好，其重复使用的范围有限。</p>
+</li>
+<li><p>CustomControl , 其开发出来的控件才真正具有 WPF 风格，其对模板样式有着很好的支持，这是因为打造 CustomControl 时做到了逻辑代码与外观相分离，即使换上一套完全不同的视觉树其同样能很好的工作，就像 WPF 内置的控件一样。</p>
+</li>
+<li><p>在使用 Visual Studio 打造控件时 , UserControl 与 CustomControl 的差别就更加明显，在项目中添加一个 UserControl 时，我们会发现设计器为我们添加了一个 XAML 文件以及一个对应的 .CS 文件「或 .VB 等」，然后你就可以像设计普通窗体一样设计该 UserControl ; 如果我们是在项目中添加一个 CustomControl , 情况却不是这样，设计器会为我们生成一个 .CS 文件「或 .VB 等」，该文件用于编写控件的后台逻辑，而控件的外观却定义在了软件的应用主题「Theme」中了「如果你没有为软件定义通用主题，其会自动生成一个通用主题 <code>themes\generic.xaml</code>, 然后主题中会自动为你的控件生成一个 Style 」，并将通用主题与该控件关联了起来。这也就是 CustomControl 对样式的支持度比 UserControl 好的原因。</p>
+</li>
+</ul>
+<p>这里为了简便起见，使用 UserControl 创建自定义控件。</p>
+<h2 id="1-1-新建-UserControl"><a href="#1-1-新建-UserControl" class="headerlink" title="1.1 新建 UserControl"></a>1.1 新建 UserControl</h2><p>对项目点击右键，选择「添加」-&gt;「新建项」，选择 「用户控件『WPF』」”, 即可成功添加自定义控件。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-b89696c7b86cd46b.jpg" alt="添加自定义控件"></p>
+<p>对该控件进行设计，拖入几个系统控件，并修改其参数即可。下图展示的是我使用 Microsoft Blend 设计对控件进行设计：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-607919602e2478ec.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="使用Microsoft Blend设计控件"></p>
+<h2 id="1-2-UserControl-的基本代码"><a href="#1-2-UserControl-的基本代码" class="headerlink" title="1.2 UserControl 的基本代码"></a>1.2 UserControl 的基本代码</h2><p> 控件设计完毕后，右键单击控件编辑窗口，选择「查看代码」，或直接按「F7」键，即可编辑该控件类的源代码。我主要添加了该控件的初始化，改变控件的背景颜色，以及动态设定控件显示的值等代码功能，具体如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">/// &lt;summary&gt;</div><div class="line">///     _bitkyPoleControl.xaml 的交互逻辑</div><div class="line">/// &lt;/summary&gt;</div><div class="line">public partial class BitkyPoleControl : UserControl</div><div class="line">&#123;</div><div class="line">    private readonly Color _colorBlue = Color.FromRgb(0, 255, 200);</div><div class="line">    //改变颜色</div><div class="line">    private readonly Color _colorRed = Color.FromRgb(255, 0, 0);</div><div class="line"></div><div class="line">    public BitkyPoleControl()</div><div class="line">    &#123;</div><div class="line">        InitializeComponent();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public int _id &#123; get; private set; &#125; = -1;</div><div class="line"></div><div class="line">    /// &lt;summary&gt;</div><div class="line">    ///     根据参数初始化该控件</div><div class="line">    /// &lt;/summary&gt;</div><div class="line">    /// &lt;param name=&quot;id&quot;&gt;输入的参数&lt;/param&gt;</div><div class="line">    public void setContent(int id)</div><div class="line">    &#123;</div><div class="line">        Name = &quot;bitkyPoleControl&quot; + id;</div><div class="line">        labelPoleId.Content = id;</div><div class="line">        _id = id;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void SetValue(int num)</div><div class="line">    &#123;</div><div class="line">        labelNum.Content = num;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /// &lt;summary&gt;</div><div class="line">    ///     设置背景颜色，0:绿  1:红</div><div class="line">    /// &lt;/summary&gt;</div><div class="line">    /// &lt;param name=&quot;i&quot;&gt;&lt;/param&gt;</div><div class="line">    public void setColor(int i)</div><div class="line">    &#123;</div><div class="line">        if (i == 0)</div><div class="line">            Background = new SolidColorBrush(_colorBlue);</div><div class="line">        if (i == 1)</div><div class="line">            Background = new SolidColorBrush(_colorRed);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="2-Grid-中控件的动态添加"><a href="#2-Grid-中控件的动态添加" class="headerlink" title="2. Grid 中控件的动态添加"></a>2. Grid 中控件的动态添加</h1><h2 id="2-1-主窗体中-Grid-的配置"><a href="#2-1-主窗体中-Grid-的配置" class="headerlink" title="2.1 主窗体中 Grid 的配置"></a>2.1 主窗体中 Grid 的配置</h2><p>我在主窗体中添加了一个 Grid , 并将该 Grid 平均分成了八行八列，如下图所示：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-c1ad801a4c8c79d7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="主窗体中的 Grid"></p>
+<p>设置方法如下：如下图所示，通过对 Grid 的属性进行如下设置：</p>
+<ul>
+<li>在「1」处，可添加 ColumnDefinitions 和 RowDefinitions 。</li>
+<li><p>在「2」处，可设置 Grid 中单元格的最小尺寸，在 width 处，有三个选项：「Auto」,「Pixel」,「Star」。</p>
+<ul>
+<li>“Auto”：系统根据情况自动设定尺寸。</li>
+<li>“Pixel”：设定为绝对尺寸，无法自适应。</li>
+<li>“Star”：设置比重，各个行或列按照设定的比重分配Grid的空间。</li>
+</ul>
+</li>
+</ul>
+<p>在此，为了平均分配 Grid 的空间，且可根据窗口大小自适应，故将所有行和列的该项设定为「Star」，值设为「1」，即可出现上图的效果。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-6a4dcec3f0d97cef.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Grid 的设置"></p>
+<h2 id="2-2-Grid-中动态添加控件"><a href="#2-2-Grid-中动态添加控件" class="headerlink" title="2.2 Grid 中动态添加控件"></a>2.2 Grid 中动态添加控件</h2><p>在主窗体类中使用如下代码即可在 Grid 中动态添加控件 : </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">/// &lt;summary&gt;</div><div class="line">///     初始化信息显示标签界面</div><div class="line">/// &lt;/summary&gt;</div><div class="line">private void InitBitkyPoleShow()</div><div class="line">&#123;</div><div class="line">    var controls = new List&lt;BitkyPoleControl&gt;();</div><div class="line">    var id = 0;</div><div class="line">    for (var i = 0; i &lt; 8; i++)</div><div class="line">    &#123;</div><div class="line">        for (var j = 0; j &lt; 8; j++)</div><div class="line">        &#123;</div><div class="line">            var bitkyPoleControl = new BitkyPoleControl();</div><div class="line">            //在 Grid 中动态添加控件</div><div class="line">            GridPoleStatusShow.Children.Add(bitkyPoleControl);</div><div class="line">            //设定控件在 Grid 中的位置</div><div class="line">            Grid.SetRow(bitkyPoleControl, i);</div><div class="line">            Grid.SetColumn(bitkyPoleControl, j);</div><div class="line">            //将控件添加到集合中，方便下一步的使用</div><div class="line">            controls.Add(bitkyPoleControl);</div><div class="line">            //对控件使用自定义方法进行初始化</div><div class="line">            bitkyPoleControl.setContent(id);</div><div class="line">            id++;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>运行程序，效果如下图所示：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-c2fd2edee0471def.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Grid 初步显示"></p>
+<p>观察图片可知，空间排布较为美观，如若想要子控件完全填充 Grid 中的单元格，需对子控件的属性进行配置。</p>
+<h1 id="3-Grid-中子控件的动态自适应"><a href="#3-Grid-中子控件的动态自适应" class="headerlink" title="3. Grid 中子控件的动态自适应"></a>3. Grid 中子控件的动态自适应</h1><h2 id="3-1-对子控件的属性进行配置"><a href="#3-1-对子控件的属性进行配置" class="headerlink" title="3.1 对子控件的属性进行配置"></a>3.1 对子控件的属性进行配置</h2><p><img src="http://upload-images.jianshu.io/upload_images/1555570-10b96a23b3f1c847.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="对子控件的配置"></p>
+<p>如图所示，将控件的宽度和高度设为「Auto」，将 HorizontalAlignment 和 VerticalAlignment 设为「Stretch」 , Margin 设为合适的值 , 则此时,  Grid 中的子控件的即可动态自适应父控件。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-d9a008db596baf6d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="子控件的动态自适应"></p>
+<h1 id="4-参考资料"><a href="#4-参考资料" class="headerlink" title="4. 参考资料"></a>4. 参考资料</h1><ol>
+<li><a href="http://www.cnblogs.com/zhouyinhui/archive/2007/10/16/926355.html" target="_blank" rel="external">在 WPF 中自定义控件 : 概述</a></li>
+<li><a href="http://www.cnblogs.com/zhouyinhui/archive/2007/11/18/963441.html" target="_blank" rel="external">在 WPF 中自定义控件 : CustomControl</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C#</a>
+          
+            <a href="/tags/NET/" rel="tag"># .NET</a>
+          
+            <a href="/tags/WPF/" rel="tag"># WPF</a>
+          
+            <a href="/tags/GUI/" rel="tag"># GUI</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/06/logcat/" rel="next" title="荣耀v8 真机调试时不显示 Logcat 日志的解决办法">
+                <i class="fa fa-chevron-left"></i> 荣耀v8 真机调试时不显示 Logcat 日志的解决办法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/25/sqlite/" rel="prev" title="用于 C# 的 SQL 基本语法总结">
+                用于 C# 的 SQL 基本语法总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-csdn"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-WPF-下的自定义控件"><span class="nav-number">1.</span> <span class="nav-text">1. WPF 下的自定义控件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-新建-UserControl"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 新建 UserControl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-UserControl-的基本代码"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 UserControl 的基本代码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Grid-中控件的动态添加"><span class="nav-number">2.</span> <span class="nav-text">2. Grid 中控件的动态添加</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-主窗体中-Grid-的配置"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 主窗体中 Grid 的配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-Grid-中动态添加控件"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Grid 中动态添加控件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Grid-中子控件的动态自适应"><span class="nav-number">3.</span> <span class="nav-text">3. Grid 中子控件的动态自适应</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-对子控件的属性进行配置"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 对子控件的属性进行配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-参考资料"><span class="nav-number">4.</span> <span class="nav-text">4. 参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

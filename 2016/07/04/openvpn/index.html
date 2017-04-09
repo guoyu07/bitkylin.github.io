@@ -1,0 +1,932 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="OpenVPN,VPN," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="1. OpenVPN 简介OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、">
+<meta name="keywords" content="OpenVPN,VPN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 OpenVPN 搭建虚拟专用网络">
+<meta property="og:url" content="http://bitky.cc/2016/07/04/openvpn/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="1. OpenVPN 简介OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-204de9669fcbef05.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-f54bdaf3806f43d3?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-25f2ee1b7a44fc85?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-04-09T05:21:32.573Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用 OpenVPN 搭建虚拟专用网络">
+<meta name="twitter:description" content="1. OpenVPN 简介OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-204de9669fcbef05.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2016/07/04/openvpn/"/>
+
+
+
+
+
+  <title> 使用 OpenVPN 搭建虚拟专用网络 | 比特麒麟 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/07/04/openvpn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                使用 OpenVPN 搭建虚拟专用网络
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-07-04T12:57:47+08:00">
+                2016-07-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/其他/" itemprop="url" rel="index">
+                    <span itemprop="name">其他</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-OpenVPN-简介"><a href="#1-OpenVPN-简介" class="headerlink" title="1. OpenVPN 简介"></a>1. OpenVPN 简介</h1><p>OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、Mac OS X 与 Microsoft Windows 以及 Android 和 iOS 上运行，并包含了许多安全性的功能。它并不是一个基于 Web 的 VPN 软件，也不与 IPsec 及其他 VPN 软件包兼容。</p>
+<h2 id="1-1-OpenVPN-的配置原理"><a href="#1-1-OpenVPN-的配置原理" class="headerlink" title="1.1 OpenVPN 的配置原理"></a>1.1 OpenVPN 的配置原理</h2><p>OpenVPN 的配置工作主要分为如下两步：</p>
+<ul>
+<li><p>第一步，创建加密证书和私钥，其中包括服务器端和客户端都要用到的核心 CA 证书和私钥，服务器端自身的加密证书(即公钥)和私钥，以及每个客户端对应的加密证书和私钥。</p>
+</li>
+<li><p>第二步，为服务器和客户端编写对应的配置文件，然后将其与第一步中生成的相应证书、私钥放在 OpenVPN 安装目录的 config 文件夹下。</p>
+</li>
+</ul>
+<p>OpenVPN 支持基于加密证书的双向认证。在 OpenVPN 中，不管是服务器还是客户端，所有的证书和私钥都需要由服务器端生成，客户端要先获得服务器端分配给它的加密证书和密钥才能成功连接。这与使用网上银行有些类似，大多数银行网站都会要求你先下载并安装一个数字证书，才允许你进行网上付款或其他操作。</p>
+<h2 id="1-2-OpenVPN-的下载"><a href="#1-2-OpenVPN-的下载" class="headerlink" title="1.2 OpenVPN 的下载"></a>1.2 OpenVPN 的下载</h2><p>在 OpenVPN 的官网上，打开如下网页：</p>
+<p><a href="https://openvpn.net/index.php/download/community-downloads.html" target="_blank" rel="external">https://openvpn.net/index.php/download/community-downloads.html</a></p>
+<p>使用图片所示内容最后的下载链接，可下载到适用于 Windows Vista 及之后版本 Windows 系统的安装文件。本文以 OpenVPN 2.3.11 版本为例简要介绍 OpenVPN 的安装、配置、使用方法。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-204de9669fcbef05.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="OpenVPN 下载页面"></p>
+<p>#2. OpenVPN 服务器端的配置</p>
+<h2 id="2-1-OpenVPN-的安装"><a href="#2-1-OpenVPN-的安装" class="headerlink" title="2.1 OpenVPN 的安装"></a>2.1 OpenVPN 的安装</h2><p>打开 OpenVPN 的安装程序进行安装。在安装的过程中，要求选择安装内容，默认未选中 easy-rsa 「加密证书生成程序」，因此，我们必须手动勾选未选中的两个选项，之后如若询问是否安装 TAP-Win32 驱动程序，确认安装即可。</p>
+<h2 id="2-2-创建加密证书和私钥"><a href="#2-2-创建加密证书和私钥" class="headerlink" title="2.2 创建加密证书和私钥"></a>2.2 创建加密证书和私钥</h2><p>1、使用文本编辑器 <strong>以管理员权限</strong> 打开并修改 OpenVPN 服务器端的 vars.bat.sample 文件「客户端的无需做任何修改」。vars.bat.sample 文件位于：</p>
+<pre><code>OpenVPN\easy-rsa\vars.bat.sample
+</code></pre><p>文本内容部分摘录如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">set HOME=%ProgramFiles%\OpenVPN\easy-rsa </div><div class="line"><span class="comment">//变量HOME表示easy-rsa文件夹的路径</span></div><div class="line"></div><div class="line">set KEY_CONFIG=openssl-<span class="number">1.0</span>.0.cnf </div><div class="line"><span class="comment">//变量KEY_SIZE表示生成的私钥大小，一般填写为1024或2048，默认为1024位，可根据自己的需要进行修改。</span></div><div class="line"></div><div class="line"><span class="comment">//由于稍后给客户端生成对应加密证书和私钥时，程序会要求我们输入一些注册信息。建议修改相关变量的默认值，这样在稍后生成客户端证书的时候，如果该信息项不输入就会采用默认值。</span></div><div class="line">set KEY_COUNTRY=CN <span class="comment">//国家(注：必须为两位字符)</span></div><div class="line">set KEY_PROVINCE=GuangXi <span class="comment">//省份</span></div><div class="line">set KEY_CITY=GuiLin <span class="comment">//城市</span></div><div class="line">set KEY_ORG=GUET <span class="comment">//机构</span></div><div class="line">set KEY_EMAIL=***@<span class="number">126</span>.com <span class="comment">//邮箱</span></div><div class="line">set KEY_CN=changeme <span class="comment">//证书的通用名称(Common Name),相当于帐户名 (eg, your name or your server's hostname)</span></div><div class="line">set KEY_NAME=changeme <span class="comment">//用户姓名</span></div><div class="line">set KEY_OU=changeme <span class="comment">//部门名 Organizational Unit Name (eg, section)</span></div><div class="line">set PKCS11_MODULE_PATH=changeme</div><div class="line">set PKCS11_PIN=<span class="number">1234</span></div></pre></td></tr></table></figure>
+<p>按照如上所述进行修改，修改完毕后，保存，接下来进行配置操作</p>
+<h2 id="2-3-使用控制台创建服务端和客户端证书"><a href="#2-3-使用控制台创建服务端和客户端证书" class="headerlink" title="2.3 使用控制台创建服务端和客户端证书"></a>2.3 使用控制台创建服务端和客户端证书</h2><p>在作为服务器端的电脑上，<strong>以管理员权限</strong> 打开 cmd , 并进入到</p>
+<pre><code>OpenVPN\easy-rsa
+</code></pre><p>然后依次执行如下命令：</p>
+<pre><code>1. init-config「初始化配置，将 vars.bat.sample 文件的内容复制到 vars.bat。实际上，你也可以直接双击执行 easy-rsa 目录下的 init-config.bat 文件来代替这一步。」
+
+2. vars「设置相应的局部环境变量，就是我们在 vars.bat.sample 文件中设置的内容」
+
+3. clean-all「相关设置和清理工作」
+</code></pre><p>命令执行结果如下所示：</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">Microsoft Windows [版本 <span class="number">10</span>.<span class="number">0</span>.<span class="number">10586</span>]</div><div class="line">(c) <span class="number">2015</span> Microsoft Corporation。保留所有权利。</div><div class="line"><span class="function">C:\<span class="title">Windows</span>\<span class="title">system32</span>&gt;<span class="title">cd</span> <span class="title">C</span>:\<span class="title">Program</span> <span class="title">Files</span>\<span class="title">OpenVPN</span>\<span class="title">easy</span>-<span class="title">rsa</span></span></div><div class="line"><span class="title">C</span>:\<span class="title">Program</span> <span class="title">Files</span>\<span class="title">OpenVPN</span>\<span class="title">easy</span>-<span class="title">rsa</span>&gt;<span class="title">init</span>-<span class="title">config</span></div><div class="line"><span class="title">C</span>:\<span class="title">Program</span> <span class="title">Files</span>\<span class="title">OpenVPN</span>\<span class="title">easy</span>-<span class="title">rsa</span>&gt;<span class="title">copy</span> <span class="title">vars.bat.sample</span> <span class="title">vars.bat</span></div><div class="line">已复制         1 个文件。</div><div class="line"><span class="title">C</span>:\<span class="title">Program</span> <span class="title">Files</span>\<span class="title">OpenVPN</span>\<span class="title">easy</span>-<span class="title">rsa</span>&gt;<span class="title">vars</span></div><div class="line"><span class="title">C</span>:\<span class="title">Program</span> <span class="title">Files</span>\<span class="title">OpenVPN</span>\<span class="title">easy</span>-<span class="title">rsa</span>&gt;<span class="title">clean</span>-<span class="title">all</span></div><div class="line">系统找不到指定的文件。   //有时候会出现此句提示，可以被忽略</div><div class="line">已复制         1 个文件。</div><div class="line">已复制         1 个文件。</div></pre></td></tr></table></figure>
+<p>接下来执行如下命令：</p>
+<pre><code>4. build-ca「创建 CA 根证书及 key」
+</code></pre><p>此处可修改此前预先设置的注册信息。</p>
+<pre><code>5. build-key-server server「创建服务端证书及 key，其中『server』可以自由设定」
+</code></pre><p>命令执行结果如下所示：</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function">C:\<span class="title">Program</span> <span class="title">Files</span>\<span class="title">OpenVPN</span>\<span class="title">easy</span>-<span class="title">rsa</span>&gt;<span class="title">build</span>-<span class="title">key</span>-<span class="title">server</span> <span class="title">server</span></span></div><div class="line"><span class="title">Common</span> <span class="title">Name</span> (<span class="title">eg</span>, <span class="title">your</span> <span class="title">name</span> <span class="title">or</span> <span class="title">your</span> <span class="title">server</span>'<span class="title">s</span> <span class="title">hostname</span>) [<span class="title">changeme</span>]:此处输入账户名</div><div class="line"><span class="title">A</span> <span class="title">challenge</span> <span class="title">password</span> []:此处输入密码</div><div class="line"></div><div class="line"><span class="title">Certificate</span> <span class="title">is</span> <span class="title">to</span> <span class="title">be</span> <span class="title">certified</span> <span class="title">until</span> <span class="title">Jul</span>  2 12:07:01 2026 <span class="title">GMT</span> (3650 <span class="title">days</span>)</div><div class="line"><span class="title">Sign</span> <span class="title">the</span> <span class="title">certificate</span>? [<span class="title">y</span>/<span class="title">n</span>]:<span class="title">y</span></div><div class="line">1 <span class="title">out</span> <span class="title">of</span> 1 <span class="title">certificate</span> <span class="title">requests</span> <span class="title">certified</span>, <span class="title">commit</span>? [<span class="title">y</span>/<span class="title">n</span>]<span class="title">y</span></div></pre></td></tr></table></figure>
+<p>命令中的参数 <code>server</code> 指的是生成的证书文件名称，你可以按照自己的需要进行修改，不过后面的 <code>Common Name</code> 也应保持一致。最后程序会询问你是否注册并提交证书，两次均输入 y 即可。</p>
+<pre><code>6. build-dh「创建迪菲·赫尔曼密钥，生成 1024 bit 的key」
+</code></pre><p>迪菲·赫尔曼密钥交换「Diffie–Hellman key exchange , 简称『D–H』」是一种安全协议。它可以让双方在完全没有对方任何预先信息的条件下通过不安全信道创建起一个密钥。这个密钥可以在后续的通讯中作为对称密钥来加密通讯内容。</p>
+<pre><code>7. build-key client「创建客户端证书及 key , 其中 `client` 可以自由设定」
+</code></pre><p>此处如同第 5 步服务器部分的设置。</p>
+<pre><code>8. openvpn --genkey --secret keys/ta.key「可选操作，生成 ta.key」
+</code></pre><p>这一步是可选操作，生成的 ta.key 主要用于防御 DoS、UDP 淹没等恶意攻击。命令中的第 3 个参数 keys / ta.key 表示生成的文件路径「含文件名」。</p>
+<p>创建完证书后，我们会发现 easy-rsa 目录下多了一个 keys 文件夹。但如果参数填写不恰当，可能生成一些 0 字节的 crt 文件，那么就得重新生成证书。生成结束后，可按照如下表格分别将文件拷贝到客户端和服务端的 config 目录中。</p>
+<p>服务器端 config 目录需要的文件包括：</p>
+<table>
+<thead>
+<tr>
+<th>文件名</th>
+<th style="text-align:left">位置</th>
+<th style="text-align:left">用途</th>
+<th style="text-align:center">保密</th>
+<th style="text-align:center">备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ca.crt</td>
+<td style="text-align:left">server + all clients</td>
+<td style="text-align:left">Root CA certificate</td>
+<td style="text-align:center">NO</td>
+<td style="text-align:center">核心 CA 证书</td>
+</tr>
+<tr>
+<td>ca.key</td>
+<td style="text-align:left">key signing machine only</td>
+<td style="text-align:left">Root CA key</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">核心 CA 私钥</td>
+</tr>
+<tr>
+<td>dh1024.pem</td>
+<td style="text-align:left">server only</td>
+<td style="text-align:left">Diffie Hellman parameters</td>
+<td style="text-align:center">NO</td>
+<td style="text-align:center">如果最初的变量 KEY_SIZE 设为 2048，这里就是 dh2048.pem</td>
+</tr>
+<tr>
+<td>server.crt</td>
+<td style="text-align:left">server only</td>
+<td style="text-align:left">Server Certificate</td>
+<td style="text-align:center">NO</td>
+<td style="text-align:center">名称 server 根据个人设置有所不同</td>
+</tr>
+<tr>
+<td>server.key</td>
+<td style="text-align:left">server only</td>
+<td style="text-align:left">Server Key</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">名称 server 根据个人设置有所不同</td>
+</tr>
+<tr>
+<td>ta.key</td>
+<td style="text-align:left">server + all clients</td>
+<td style="text-align:left">防御 DoS、UDP 淹没等恶意攻击</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">名称也可自行设置，如果不需要防御攻击，可以不创建或复制此文件</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>客户端 config 目录需要的文件包括：</p>
+<table>
+<thead>
+<tr>
+<th>文件名</th>
+<th style="text-align:left">位置</th>
+<th style="text-align:left">用途</th>
+<th style="text-align:center">保密</th>
+<th style="text-align:center">备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ca.crt</td>
+<td style="text-align:left">server + all clients</td>
+<td style="text-align:left">Root CA certificate</td>
+<td style="text-align:center">NO</td>
+<td style="text-align:center">核心 CA 证书</td>
+</tr>
+<tr>
+<td>client.crt</td>
+<td style="text-align:left">client only</td>
+<td style="text-align:left">Client Certificate</td>
+<td style="text-align:center">NO</td>
+<td style="text-align:center">名称 client 根据个人设置有所不同</td>
+</tr>
+<tr>
+<td>client1.key</td>
+<td style="text-align:left">client only</td>
+<td style="text-align:left">Client Key</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">名称 client 根据个人设置有所不同</td>
+</tr>
+<tr>
+<td>ta.key</td>
+<td style="text-align:left">server + all clients</td>
+<td style="text-align:left">防御 DoS、UDP 淹没等恶意攻击</td>
+<td style="text-align:center">YES</td>
+<td style="text-align:center">名称也可自行设置，如果不需要防御攻击，可以不创建或复制此文件</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><strong>重要提醒</strong>：以上命令都在同一 cmd 中执行，如果你以后需要打开新窗口来执行命令(比如创建新的客户端证书)：你不需要再执行 init-config 命令，除非你再次改动了 vars.bat.sample 文件；每一次打开新窗口时都需要先执行 vars 命令，后面才能执行其他命令。</p>
+<hr>
+<p><strong>附</strong>：若要撤销 client2 证书，则执行以下命令：</p>
+<pre><code>vars
+revoke-full client2
+</code></pre><p>此时得到 crl.pem 文件，之后在服务端执行如下命令：</p>
+<pre><code>crl-verify crl.pem
+</code></pre><h1 id="3-配置文件的修改与部署"><a href="#3-配置文件的修改与部署" class="headerlink" title="3. 配置文件的修改与部署"></a>3. 配置文件的修改与部署</h1><p>上面已创建 OpenVPN 配置所需要的各种证书和私钥，现在可以为服务器和客户端设置对应的配置文件。</p>
+<p>在 OpenVPN 的安装目录的 sample-config 文件夹中存放有 3 个示例模板文件 : server.ovpn、client.ovpn、sample.ovpn 。其中：</p>
+<ul>
+<li>server.ovpn 是服务器的配置模板</li>
+<li>client.ovpn 是客户端的配置模板</li>
+<li>sample.ovpn 也可用作客户端配置模板，不过配置比较简单，不够全面。</li>
+</ul>
+<p>按照官方的说法 , client.ovpn 可用于连接具有多个客户端的服务器端。</p>
+<p>复制 server.ovpn 到服务器的 config 目录 , client.ovpn 到客户端的 config 目录，并在此基础上进行修改。在 OpenVPN 的配置文件中，前面带「#」或「;」的表示注释内容。</p>
+<h2 id="3-1-配置文件的简单使用"><a href="#3-1-配置文件的简单使用" class="headerlink" title="3.1  配置文件的简单使用"></a>3.1  配置文件的简单使用</h2><ul>
+<li>修改客户端的 client.ovpn 的 remote 项，让它指向服务端外部 IP 地址，格式例如 : remote x.x.x.x 1194 , 1194 是服务端定义的端口，这个可以通过服务端的配置文件修改，服务端和客户端端口必须匹配。</li>
+<li>证书：在第 92, 93 行的「大概」位置，修改指定的 crt 和 key 文件，与之生成的证书文件名匹配。</li>
+</ul>
+<h2 id="3-2-编辑服务器端配置文件"><a href="#3-2-编辑服务器端配置文件" class="headerlink" title="3.2 编辑服务器端配置文件"></a>3.2 编辑服务器端配置文件</h2><p>server.ovpn 中所有用到的命令如下 : </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">local 192.168.0.2     #指定监听的本机 IP「因为有些计算机具备多个IP地址」，该命令是可选的，默认监听所有 IP 地址。</div><div class="line">port 1194             #指定监听的本机端口号</div><div class="line">proto udp             #指定采用的传输协议，可以选择 tcp 或 udp</div><div class="line">dev tun               #指定创建的通信隧道类型，可选 tun 或 tap</div><div class="line">ca ca.crt             #指定 CA 证书的文件路径</div><div class="line">cert server.crt       #指定服务器端的证书文件路径</div><div class="line">key server.key    #指定服务器端的私钥文件路径</div><div class="line">dh dh1024.pem         #指定迪菲赫尔曼参数的文件路径</div><div class="line">server 10.0.0.0 255.255.255.0   #指定虚拟局域网占用的 IP 地址段和子网掩码，此处配置的服务器自身占用 10.0.0.1。</div><div class="line">ifconfig-pool-persist ipp.txt   #服务器自动给客户端分配 IP 后，客户端下次连接时，仍然采用上次的 IP 地址(第一次分配的IP保存在 ipp.txt中，下一次分配其中保存的 IP)。</div><div class="line">tls-auth ta.key 0     #开启 TLS，使用 ta.key 防御攻击。服务器端的第二个参数值为 0，客户端的为 1。</div><div class="line">keepalive 10 120      #每 10 秒 ping 一次，连接超时时间设为 120 秒。</div><div class="line">comp-lzo              #开启 VPN 连接压缩，如果服务器端开启，客户端也必须开启</div><div class="line">client-to-client      #允许客户端与客户端相连接，默认情况下客户端只能与服务器相连接</div><div class="line">persist-key</div><div class="line">persist-tun           #持久化选项可以尽量避免访问在重启时由于用户权限降低而无法访问的某些资源。</div><div class="line">status openvpn-status.log    #指定记录 OpenVPN 状态的日志文件路径</div><div class="line">verb 3                #指定日志文件的记录详细级别，可选 0 - 9，等级越高日志内容越详细</div></pre></td></tr></table></figure>
+<h2 id="3-3-编辑客户端配置文件"><a href="#3-3-编辑客户端配置文件" class="headerlink" title="3.3 编辑客户端配置文件"></a>3.3 编辑客户端配置文件</h2><p>client.ovpn 中所有用到的命令如下 : </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">client         #指定当前 VPN 是客户端</div><div class="line">dev tun        #必须与服务器端的保持一致</div><div class="line">proto udp      #必须与服务器端的保持一致</div><div class="line">remote 192.168.0.2 1194      //指定连接的远程服务器的实际 IP 地址和端口号</div><div class="line">resolv-retry infinite    #断线自动重新连接，在网络不稳定的情况下「例如：笔记本电脑无线网络」非常有用。</div><div class="line">nobind         #不绑定特定的本地端口号</div><div class="line">persist-key</div><div class="line">persist-tun</div><div class="line">ca ca.crt      #指定 CA 证书的文件路径</div><div class="line">cert client.crt       //指定当前客户端的证书文件路径</div><div class="line">key client.key    //指定当前客户端的私钥文件路径</div><div class="line">ns-cert-type server      #指定采用服务器校验方式</div><div class="line">tls-auth ta.key 1     //如果服务器设置了防御 DoS 等攻击的 ta.key，则必须每个客户端开启；如果未设置，则注释掉这一行；</div><div class="line">comp-lzo              #与服务器保持一致</div><div class="line">verb 3                #指定日志文件的记录详细级别，可选 0 - 9，等级越高日志内容越详细</div></pre></td></tr></table></figure>
+<h1 id="4-OpenVPN-的启用"><a href="#4-OpenVPN-的启用" class="headerlink" title="4. OpenVPN 的启用"></a>4. OpenVPN 的启用</h1><p>生成、修改、保存完毕后，我们可以在服务器端及客户端分别配置如下内容：</p>
+<p>在服务器端 OpenVPN 安装目录的 config 文件夹下应包含如下文件：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-f54bdaf3806f43d3?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="服务器端config文件夹"></p>
+<p>在客户端 OpenVPN 安装目录的 config 文件夹下应包含如下文件：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-25f2ee1b7a44fc85?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="客户端config文件夹"></p>
+<h1 id="5-参考链接"><a href="#5-参考链接" class="headerlink" title="5. 参考链接"></a>5. 参考链接</h1><ol>
+<li><a href="https://zh.wikipedia.org/wiki/OpenVPN" target="_blank" rel="external">OpenVPN 维基百科</a></li>
+<li><a href="https://openvpn.net/index.php/access-server/overview.html" target="_blank" rel="external">OpenVPN 官方网站</a></li>
+<li><a href="http://blog.csdn.net/joyous/article/details/38048425" target="_blank" rel="external">FreeBSD 平台 OpenVPN 的安装、配置客户端和服务端</a></li>
+<li><a href="http://www.365mini.com/page/14.htm" target="_blank" rel="external">OpenVPN 下载、安装、配置及使用详解</a></li>
+<li><a href="http://blog.csdn.net/joyous/article/details/8034132" target="_blank" rel="external">OpenVPN 安装、配置客户端和服务端，以及 OpenVPN 的使用「Windows 平台」</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OpenVPN/" rel="tag"># OpenVPN</a>
+          
+            <a href="/tags/VPN/" rel="tag"># VPN</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/12/mysql/" rel="next" title="MySQL 数据库的自动备份操作">
+                <i class="fa fa-chevron-left"></i> MySQL 数据库的自动备份操作
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/11/android/" rel="prev" title="Android Studio 第三方库的导入「以 Volley 为例」">
+                Android Studio 第三方库的导入「以 Volley 为例」 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-csdn"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-OpenVPN-简介"><span class="nav-number">1.</span> <span class="nav-text">1. OpenVPN 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-OpenVPN-的配置原理"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 OpenVPN 的配置原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-OpenVPN-的下载"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 OpenVPN 的下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-OpenVPN-的安装"><span class="nav-number">1.3.</span> <span class="nav-text">2.1 OpenVPN 的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-创建加密证书和私钥"><span class="nav-number">1.4.</span> <span class="nav-text">2.2 创建加密证书和私钥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-使用控制台创建服务端和客户端证书"><span class="nav-number">1.5.</span> <span class="nav-text">2.3 使用控制台创建服务端和客户端证书</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-配置文件的修改与部署"><span class="nav-number">2.</span> <span class="nav-text">3. 配置文件的修改与部署</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-配置文件的简单使用"><span class="nav-number">2.1.</span> <span class="nav-text">3.1  配置文件的简单使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-编辑服务器端配置文件"><span class="nav-number">2.2.</span> <span class="nav-text">3.2 编辑服务器端配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-编辑客户端配置文件"><span class="nav-number">2.3.</span> <span class="nav-text">3.3 编辑客户端配置文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-OpenVPN-的启用"><span class="nav-number">3.</span> <span class="nav-text">4. OpenVPN 的启用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-参考链接"><span class="nav-number">4.</span> <span class="nav-text">5. 参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
