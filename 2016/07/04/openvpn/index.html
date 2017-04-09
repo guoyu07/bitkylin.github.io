@@ -81,20 +81,20 @@
 
 
 
-<meta name="description" content="1. OpenVPN 简介OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、">
+<meta name="description" content="OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，本文主要介绍 OpenVPN 的配置及使用方法">
 <meta name="keywords" content="OpenVPN,VPN">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用 OpenVPN 搭建虚拟专用网络">
 <meta property="og:url" content="http://bitky.cc/2016/07/04/openvpn/index.html">
 <meta property="og:site_name" content="比特麒麟">
-<meta property="og:description" content="1. OpenVPN 简介OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、">
+<meta property="og:description" content="OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，本文主要介绍 OpenVPN 的配置及使用方法">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-204de9669fcbef05.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-f54bdaf3806f43d3?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-25f2ee1b7a44fc85?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-04-09T05:21:32.573Z">
+<meta property="og:updated_time" content="2017-04-09T06:30:34.124Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用 OpenVPN 搭建虚拟专用网络">
-<meta name="twitter:description" content="1. OpenVPN 简介OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、">
+<meta name="twitter:description" content="OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，本文主要介绍 OpenVPN 的配置及使用方法">
 <meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-204de9669fcbef05.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
@@ -104,7 +104,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
     fancybox: false,
     motion: false,
     duoshuo: {
@@ -196,6 +196,26 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -342,7 +362,9 @@
       
 
       
-        <h1 id="1-OpenVPN-简介"><a href="#1-OpenVPN-简介" class="headerlink" title="1. OpenVPN 简介"></a>1. OpenVPN 简介</h1><p>OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、Mac OS X 与 Microsoft Windows 以及 Android 和 iOS 上运行，并包含了许多安全性的功能。它并不是一个基于 Web 的 VPN 软件，也不与 IPsec 及其他 VPN 软件包兼容。</p>
+        <p>OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，本文主要介绍 OpenVPN 的配置及使用方法</p>
+<a id="more"></a>
+<h1 id="1-OpenVPN-简介"><a href="#1-OpenVPN-简介" class="headerlink" title="1. OpenVPN 简介"></a>1. OpenVPN 简介</h1><p>OpenVPN 是一个用于创建虚拟专用网络加密通道的软件包，最早由 James Yonan 编写。OpenVPN 允许创建的 VPN 使用公开密钥、电子证书、或者用户名／密码来进行身份验证。它大量使用了 OpenSSL 加密库中的 SSLv3 / TLSv1 协议函数库。目前 OpenVPN 能在 Solaris、Linux、OpenBSD、FreeBSD、NetBSD、Mac OS X 与 Microsoft Windows 以及 Android 和 iOS 上运行，并包含了许多安全性的功能。它并不是一个基于 Web 的 VPN 软件，也不与 IPsec 及其他 VPN 软件包兼容。</p>
 <h2 id="1-1-OpenVPN-的配置原理"><a href="#1-1-OpenVPN-的配置原理" class="headerlink" title="1.1 OpenVPN 的配置原理"></a>1.1 OpenVPN 的配置原理</h2><p>OpenVPN 的配置工作主要分为如下两步：</p>
 <ul>
 <li><p>第一步，创建加密证书和私钥，其中包括服务器端和客户端都要用到的核心 CA 证书和私钥，服务器端自身的加密证书(即公钥)和私钥，以及每个客户端对应的加密证书和私钥。</p>
@@ -650,7 +672,7 @@ revoke-full client2
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -660,10 +682,10 @@ revoke-full client2
             
             
             <div class="site-state-item site-state-categories">
-              
-                <span class="site-state-item-count">4</span>
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -671,10 +693,10 @@ revoke-full client2
             
             
             <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">20</span>
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
@@ -763,6 +785,11 @@ revoke-full client2
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -803,11 +830,6 @@ revoke-full client2
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
   </div>

@@ -65,7 +65,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content=".NET,WPF,GUI,c#," />
+  <meta name="keywords" content="CSharp,.NET,WPF,GUI," />
 
 
 
@@ -81,20 +81,20 @@
 
 
 
-<meta name="description" content="本文要实现基于 WPF 的酷炫 GUI 窗口，力图实现一个真正可用且实用的 GUI 窗口。 本文要实现的效果如图所示：  效果总结如下：  无标题栏，或自定义标题栏 窗口的半透明效果 窗口可自由拖拽 Enter 以及 Esc 等默认按键 右键菜单  1. 窗口的效果实现1.1 窗口外观相关首先新建一个窗口，更改外观，对窗口的属性进行如下设置：  外观设置中 , 「AllowsTransparenc">
-<meta name="keywords" content=".NET,WPF,GUI,c#">
+<meta name="description" content="本文要实现基于 WPF 的酷炫 GUI 窗口，力图实现一个真正可用且实用的 GUI 窗口。">
+<meta name="keywords" content="CSharp,.NET,WPF,GUI">
 <meta property="og:type" content="article">
 <meta property="og:title" content="基于 WPF 的酷炫 GUI 窗口的简易实现">
 <meta property="og:url" content="http://bitky.cc/2016/11/07/wpf/index.html">
 <meta property="og:site_name" content="比特麒麟">
-<meta property="og:description" content="本文要实现基于 WPF 的酷炫 GUI 窗口，力图实现一个真正可用且实用的 GUI 窗口。 本文要实现的效果如图所示：  效果总结如下：  无标题栏，或自定义标题栏 窗口的半透明效果 窗口可自由拖拽 Enter 以及 Esc 等默认按键 右键菜单  1. 窗口的效果实现1.1 窗口外观相关首先新建一个窗口，更改外观，对窗口的属性进行如下设置：  外观设置中 , 「AllowsTransparenc">
+<meta property="og:description" content="本文要实现基于 WPF 的酷炫 GUI 窗口，力图实现一个真正可用且实用的 GUI 窗口。">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-3e12b64d19ab769a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-7867eb5798263f7c.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-28a615bb3f79fb77.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-04-09T05:30:55.009Z">
+<meta property="og:updated_time" content="2017-04-09T06:26:21.753Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于 WPF 的酷炫 GUI 窗口的简易实现">
-<meta name="twitter:description" content="本文要实现基于 WPF 的酷炫 GUI 窗口，力图实现一个真正可用且实用的 GUI 窗口。 本文要实现的效果如图所示：  效果总结如下：  无标题栏，或自定义标题栏 窗口的半透明效果 窗口可自由拖拽 Enter 以及 Esc 等默认按键 右键菜单  1. 窗口的效果实现1.1 窗口外观相关首先新建一个窗口，更改外观，对窗口的属性进行如下设置：  外观设置中 , 「AllowsTransparenc">
+<meta name="twitter:description" content="本文要实现基于 WPF 的酷炫 GUI 窗口，力图实现一个真正可用且实用的 GUI 窗口。">
 <meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-3e12b64d19ab769a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
@@ -104,7 +104,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
     fancybox: false,
     motion: false,
     duoshuo: {
@@ -196,6 +196,26 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -307,8 +327,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/c/" itemprop="url" rel="index">
-                    <span itemprop="name">c#</span>
+                  <a href="/categories/C/" itemprop="url" rel="index">
+                    <span itemprop="name">C#</span>
                   </a>
                 </span>
 
@@ -343,6 +363,7 @@
 
       
         <p>本文要实现基于 WPF 的酷炫 GUI 窗口，力图实现一个真正可用且实用的 GUI 窗口。</p>
+<a id="more"></a>
 <p>本文要实现的效果如图所示：</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/1555570-3e12b64d19ab769a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="最终效果"></p>
 <p>效果总结如下：</p>
@@ -414,13 +435,13 @@
       
         <div class="post-tags">
           
+            <a href="/tags/CSharp/" rel="tag"># CSharp</a>
+          
             <a href="/tags/NET/" rel="tag"># .NET</a>
           
             <a href="/tags/WPF/" rel="tag"># WPF</a>
           
             <a href="/tags/GUI/" rel="tag"># GUI</a>
-          
-            <a href="/tags/c/" rel="tag"># c#</a>
           
         </div>
       
@@ -432,6 +453,10 @@
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/16/website/" rel="next" title="基于 LNMP 搭建个人网站的填坑之旅">
+                <i class="fa fa-chevron-left"></i> 基于 LNMP 搭建个人网站的填坑之旅
+              </a>
             
           </div>
 
@@ -513,7 +538,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -523,10 +548,10 @@
             
             
             <div class="site-state-item site-state-categories">
-              
-                <span class="site-state-item-count">4</span>
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -534,10 +559,10 @@
             
             
             <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">20</span>
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
@@ -626,6 +651,11 @@
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -666,11 +696,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
   </div>

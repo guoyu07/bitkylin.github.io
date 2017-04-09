@@ -65,7 +65,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="C#,MySQL,SQLite,SQL," />
+  <meta name="keywords" content="MySQL,CSharp,SQLite,SQL," />
 
 
 
@@ -81,18 +81,18 @@
 
 
 
-<meta name="description" content="本文目前用于 Visual Studio 2015 平台的 SQLite3 , 其他用法以后总结。 1. 使用 Nuget 添加 SQLite 库在 Visual Studio 2015 中，选择：工具 -&amp;gt; NuGet 包管理器 -&amp;gt; 管理解决方案的 NuGet 程序包  在此界面下检索「SQLite」, 根据需要选择安装其中一个 SQLite 库，最好是红框部分内容中，二选一。 之">
-<meta name="keywords" content="C#,MySQL,SQLite,SQL">
+<meta name="description" content="SQL 基本语法总结，本文目前用于 Visual Studio 2015 平台的 SQLite3, 其他用法以后总结。">
+<meta name="keywords" content="MySQL,CSharp,SQLite,SQL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="用于 C# 的 SQL 基本语法总结">
 <meta property="og:url" content="http://bitky.cc/2016/09/25/sqlite/index.html">
 <meta property="og:site_name" content="比特麒麟">
-<meta property="og:description" content="本文目前用于 Visual Studio 2015 平台的 SQLite3 , 其他用法以后总结。 1. 使用 Nuget 添加 SQLite 库在 Visual Studio 2015 中，选择：工具 -&amp;gt; NuGet 包管理器 -&amp;gt; 管理解决方案的 NuGet 程序包  在此界面下检索「SQLite」, 根据需要选择安装其中一个 SQLite 库，最好是红框部分内容中，二选一。 之">
+<meta property="og:description" content="SQL 基本语法总结，本文目前用于 Visual Studio 2015 平台的 SQLite3, 其他用法以后总结。">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-0a0e01e8d9e0ebe9.jpg">
-<meta property="og:updated_time" content="2017-04-09T05:26:44.018Z">
+<meta property="og:updated_time" content="2017-04-09T06:28:13.573Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用于 C# 的 SQL 基本语法总结">
-<meta name="twitter:description" content="本文目前用于 Visual Studio 2015 平台的 SQLite3 , 其他用法以后总结。 1. 使用 Nuget 添加 SQLite 库在 Visual Studio 2015 中，选择：工具 -&amp;gt; NuGet 包管理器 -&amp;gt; 管理解决方案的 NuGet 程序包  在此界面下检索「SQLite」, 根据需要选择安装其中一个 SQLite 库，最好是红框部分内容中，二选一。 之">
+<meta name="twitter:description" content="SQL 基本语法总结，本文目前用于 Visual Studio 2015 平台的 SQLite3, 其他用法以后总结。">
 <meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-0a0e01e8d9e0ebe9.jpg">
 
 
@@ -102,7 +102,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
     fancybox: false,
     motion: false,
     duoshuo: {
@@ -194,6 +194,26 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -305,8 +325,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index">
-                    <span itemprop="name">Java</span>
+                  <a href="/categories/C/" itemprop="url" rel="index">
+                    <span itemprop="name">C#</span>
                   </a>
                 </span>
 
@@ -340,7 +360,8 @@
       
 
       
-        <p>本文目前用于 Visual Studio 2015 平台的 SQLite3 , 其他用法以后总结。</p>
+        <p> SQL 基本语法总结，本文目前用于 Visual Studio 2015 平台的 SQLite3, 其他用法以后总结。</p>
+ <a id="more"></a>
 <h1 id="1-使用-Nuget-添加-SQLite-库"><a href="#1-使用-Nuget-添加-SQLite-库" class="headerlink" title="1. 使用 Nuget 添加 SQLite 库"></a>1. 使用 Nuget 添加 SQLite 库</h1><p>在 Visual Studio 2015 中，选择：工具 -&gt; NuGet 包管理器 -&gt; 管理解决方案的 NuGet 程序包</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/1555570-0a0e01e8d9e0ebe9.jpg" alt="NuGet 管理界面"></p>
 <p>在此界面下检索「SQLite」, 根据需要选择安装其中一个 SQLite 库，最好是红框部分内容中，二选一。</p>
@@ -386,9 +407,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/C/" rel="tag"># C#</a>
-          
             <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+            <a href="/tags/CSharp/" rel="tag"># CSharp</a>
           
             <a href="/tags/SQLite/" rel="tag"># SQLite</a>
           
@@ -489,7 +510,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -499,10 +520,10 @@
             
             
             <div class="site-state-item site-state-categories">
-              
-                <span class="site-state-item-count">4</span>
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -510,10 +531,10 @@
             
             
             <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">20</span>
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
@@ -602,6 +623,11 @@
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -642,11 +668,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
   </div>

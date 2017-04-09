@@ -1,0 +1,822 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Maven,可执行 Jar,资源文件," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Maven 的常用技巧总结，包括设置 Java JDK 的版本为 JDK 1.8，构建生成可执行的 Jar，读取 resources 目录中的资源文件等。">
+<meta name="keywords" content="Java,Maven,可执行 Jar,资源文件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Maven 常用技巧总结">
+<meta property="og:url" content="http://bitky.cc/2017/04/06/maven/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="Maven 的常用技巧总结，包括设置 Java JDK 的版本为 JDK 1.8，构建生成可执行的 Jar，读取 resources 目录中的资源文件等。">
+<meta property="og:updated_time" content="2017-04-09T06:51:04.943Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Maven 常用技巧总结">
+<meta name="twitter:description" content="Maven 的常用技巧总结，包括设置 Java JDK 的版本为 JDK 1.8，构建生成可执行的 Jar，读取 resources 目录中的资源文件等。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2017/04/06/maven/"/>
+
+
+
+
+
+  <title> Maven 常用技巧总结 | 比特麒麟 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2017/04/06/maven/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Maven 常用技巧总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-06T12:57:47+08:00">
+                2017-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Maven 的常用技巧总结，包括设置 Java JDK 的版本为 JDK 1.8，构建生成可执行的 Jar，读取 resources 目录中的资源文件等。</p>
+<a id="more"></a>
+<h1 id="1-设置-Java-JDK-的版本为「JDK-1-8」"><a href="#1-设置-Java-JDK-的版本为「JDK-1-8」" class="headerlink" title="1. 设置 Java JDK 的版本为「JDK 1.8」"></a>1. 设置 Java JDK 的版本为「JDK 1.8」</h1><p>可以修改 pom.xml 添加如下语句实现使用 Java 8 语言特性，共有两种方式，可任选其一：</p>
+<h2 id="1-1-添加-property"><a href="#1-1-添加-property" class="headerlink" title="1.1 添加 property"></a>1.1 添加 property</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  [...]</div><div class="line">  <span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">maven.compiler.source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">maven.compiler.source</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">maven.compiler.target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">maven.compiler.target</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line">  [...]</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="1-2-直接配置插件"><a href="#1-2-直接配置插件" class="headerlink" title="1.2 直接配置插件"></a>1.2 直接配置插件</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  [...]</div><div class="line">  <span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">    [...]</div><div class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.6.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">source</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">source</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">target</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">target</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div><div class="line">    [...]</div><div class="line">  <span class="tag">&lt;/<span class="name">build</span>&gt;</span></div><div class="line">  [...]</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<h1 id="2-Maven-构建生成可执行的-Jar"><a href="#2-Maven-构建生成可执行的-Jar" class="headerlink" title="2. Maven 构建生成可执行的 Jar"></a>2. Maven 构建生成可执行的 Jar</h1><h2 id="2-1-简单构建可执行的-Jar"><a href="#2-1-简单构建可执行的-Jar" class="headerlink" title="2.1 简单构建可执行的 Jar"></a>2.1 简单构建可执行的 Jar</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  [...]</div><div class="line">  <span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">    [...]</div><div class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-assembly-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">          [...]</div><div class="line">          <span class="tag">&lt;<span class="name">archive</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">manifest</span>&gt;</span></div><div class="line">              <span class="tag">&lt;<span class="name">mainClass</span>&gt;</span>org.sample.App<span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></div><div class="line">          <span class="tag">&lt;/<span class="name">archive</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">        [...]</div><div class="line">      <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">      [...]</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>此时可使用如下命令构建可执行 Jar</p>
+<pre><code>mvn assembly:single
+</code></pre><h2 id="2-2-将-Assembly-的-single-目标绑定到项目的构建生命周期中"><a href="#2-2-将-Assembly-的-single-目标绑定到项目的构建生命周期中" class="headerlink" title="2.2 将 Assembly 的 single 目标绑定到项目的构建生命周期中"></a>2.2 将 Assembly 的 single 目标绑定到项目的构建生命周期中</h2><p>可在 pom.xml 文件中添加如下内容：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span>    </div><div class="line">  [...]              </div><div class="line">  <span class="tag">&lt;<span class="name">build</span>&gt;</span>        </div><div class="line">    [...]                            </div><div class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-assembly-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">            <span class="comment">&lt;!-- append assembly id in release file name --&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">appendAssemblyId</span>&gt;</span>true<span class="tag">&lt;/<span class="name">appendAssemblyId</span>&gt;</span></div><div class="line">            <span class="comment">&lt;!--构建可执行的 Jar--&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">archive</span>&gt;</span></div><div class="line">              <span class="tag">&lt;<span class="name">manifest</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">mainClass</span>&gt;</span>cc.bitky.fx.Main<span class="tag">&lt;/<span class="name">mainClass</span>&gt;</span></div><div class="line">              <span class="tag">&lt;/<span class="name">manifest</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">archive</span>&gt;</span></div><div class="line">            <span class="comment">&lt;!--使用「Jar集成依赖」的描述符--&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">descriptorRefs</span>&gt;</span></div><div class="line">              <span class="tag">&lt;<span class="name">descriptorRef</span>&gt;</span>jar-with-dependencies<span class="tag">&lt;/<span class="name">descriptorRef</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">descriptorRefs</span>&gt;</span></div><div class="line">          <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">executions</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">execution</span>&gt;</span></div><div class="line">              <span class="tag">&lt;<span class="name">id</span>&gt;</span>make-assembly<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">              <span class="comment">&lt;!-- this is used for inheritance merges --&gt;</span></div><div class="line">              <span class="tag">&lt;<span class="name">phase</span>&gt;</span>package<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></div><div class="line">              <span class="comment">&lt;!-- bind to the packaging phase --&gt;</span></div><div class="line">              <span class="tag">&lt;<span class="name">goals</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">goal</span>&gt;</span>single<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></div><div class="line">              <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></div><div class="line">          <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div><div class="line">    [...]  </div><div class="line">  <span class="tag">&lt;/<span class="name">build</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>之后，为了生成项目的 Jar 文件，可以简单地执行如下生命周期阶段命令：</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn package</div></pre></td></tr></table></figure>
+<p>构建完毕后，可以看到已经生成了类似于以下名字的文件：</p>
+<pre><code>target / sample-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+target / sample-1.0.jar
+</code></pre><p>appendAssemblyId: 控制是否在已生成的文件的文件名中包含「ssembly id」。</p>
+<p>execution: 用于将 maven-assembly-plugin 集成至标准的 Maven 构建生命周期中，此时执行 <code>maven package</code> 时就会执行指定的操作，从而实现自定义打包。</p>
+<h2 id="2-3-Assembly-插件的-Maven-Goals"><a href="#2-3-Assembly-插件的-Maven-Goals" class="headerlink" title="2.3 Assembly 插件的 Maven Goals"></a>2.3 Assembly 插件的 Maven Goals</h2><ul>
+<li>assembly:assembly: 「已弃用」会自动执行 package 生命周期。</li>
+<li>assembly:single: 仅会装配成 jar-with-dependencies，我们不想让 package 阶段运行两次 package，所以配置为这个。</li>
+</ul>
+<h1 id="3-Maven-中读取资源文件"><a href="#3-Maven-中读取资源文件" class="headerlink" title="3. Maven 中读取资源文件"></a>3. Maven 中读取资源文件</h1><p>在 Maven 项目的根目录下，有如下必要的目录结构:</p>
+<blockquote>
+<ul>
+<li>src<ul>
+<li>main<ul>
+<li>resources「存放一些资源文件」</li>
+<li>java</li>
+</ul>
+</li>
+<li>test<ul>
+<li>resources「存放一些资源文件」</li>
+<li>java</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>pom.xml</li>
+</ul>
+</blockquote>
+<p>在项目的 <code>compile</code> 时期，所有的资源文件和 <code>.class</code> 文件均被复制到 <code>target/classes/</code> 目录中，获取资源文件，可参考如下语句：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span>. <span class="keyword">this</span>.getClass().getResource（<span class="string">""</span>）</div><div class="line">   <span class="comment">//得到的是当前类 class 文件所在的目录 URL。</span></div><div class="line"></div><div class="line"><span class="number">2</span>. <span class="keyword">this</span>.getClass().getResource（<span class="string">"/"</span>）</div><div class="line"><span class="number">3</span>. <span class="keyword">this</span>.getClass().getClassLoader().getResource（<span class="string">""</span>）</div><div class="line"><span class="number">4</span>. ClassLoader.getSystemResource（<span class="string">""</span>）</div><div class="line"><span class="number">5</span>. Thread.currentThread().getContextClassLoader().getResource（<span class="string">""</span>）</div><div class="line">   <span class="comment">//得到的是当前 ClassPath 的绝对 URI 路径。</span></div></pre></td></tr></table></figure>
+<p>所以，如若想要获取 <code>resources</code> 文件夹中的资源文件 <code>ky.xml</code>，可使用如下语句之一：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">getClass().getClassLoader().getResource(&quot;ky.xml&quot;)</div><div class="line">getClass().getResource(&quot;/ky.fxml&quot;)</div></pre></td></tr></table></figure>
+<h1 id="4-参考资料"><a href="#4-参考资料" class="headerlink" title="4. 参考资料"></a>4. 参考资料</h1><ol>
+<li><a href="http://maven.apache.org/components/plugins/maven-compiler-plugin/examples/set-compiler-source-and-target.html" target="_blank" rel="external">Setting the -source and -target of the Java Compiler</a></li>
+<li><a href="https://www.ibm.com/developerworks/cn/java/j-5things13/" target="_blank" rel="external">关于 Apache Maven 您不知道的 5 件事</a></li>
+<li><a href="https://my.oschina.net/simpleton/blog/607776" target="_blank" rel="external">Maven 打包可执行 Jar 的方法</a></li>
+<li><a href="http://tonglin.iteye.com/blog/556449" target="_blank" rel="external"><a href="http://tonglin.iteye.com/blog/556449" target="_blank" rel="external">关于创建可执行的 Jar 文件</a></a></li>
+<li><a href="http://www.blogjava.net/aoxj/archive/2009/01/16/251615.html" target="_blank" rel="external">初学 Maven - 使用 Assembly Plugin 实现自定义打包</a></li>
+<li><a href="http://stackoverflow.com/questions/22000423/javafx-and-maven-nullpointerexception-location-is-required" target="_blank" rel="external">JavaFX and maven: NullPointerException: Location is required</a></li>
+<li><a href="http://liumh.com/2014/01/14/get-path-of-file-with-java/" target="_blank" rel="external">Java 获取文件的路径</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Maven/" rel="tag"># Maven</a>
+          
+            <a href="/tags/可执行-Jar/" rel="tag"># 可执行 Jar</a>
+          
+            <a href="/tags/资源文件/" rel="tag"># 资源文件</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/26/website/" rel="prev" title="为你的简书和 GitHub 设定个性域名">
+                为你的简书和 GitHub 设定个性域名 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-csdn"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-设置-Java-JDK-的版本为「JDK-1-8」"><span class="nav-number">1.</span> <span class="nav-text">1. 设置 Java JDK 的版本为「JDK 1.8」</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-添加-property"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 添加 property</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-直接配置插件"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 直接配置插件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Maven-构建生成可执行的-Jar"><span class="nav-number">2.</span> <span class="nav-text">2. Maven 构建生成可执行的 Jar</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-简单构建可执行的-Jar"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 简单构建可执行的 Jar</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-将-Assembly-的-single-目标绑定到项目的构建生命周期中"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 将 Assembly 的 single 目标绑定到项目的构建生命周期中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Assembly-插件的-Maven-Goals"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 Assembly 插件的 Maven Goals</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Maven-中读取资源文件"><span class="nav-number">3.</span> <span class="nav-text">3. Maven 中读取资源文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-参考资料"><span class="nav-number">4.</span> <span class="nav-text">4. 参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

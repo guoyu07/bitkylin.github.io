@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="本文由文末的参考链接整理、整合、修改而成  1. 电子地图坐标系统简介 WGS-84 坐标系：即地球坐标系，国际经纬度坐标标准 GCJ-02 坐标系：即火星坐标系，WGS84 坐标系经加密后的坐标系，国测局制定。 BD-09 坐标系：即百度坐标系，GCJ02 坐标系经加密后的坐标系。  GCJ-02 坐标系统，就是在标准的 WGS-84 坐标系统上进行了人为的偏移，比如 Google 地图、腾讯">
+<meta name="description" content="电子地图坐标系统研究整理总汇。">
 <meta name="keywords" content="Java,Android,坐标">
 <meta property="og:type" content="article">
 <meta property="og:title" content="「转」电子地图坐标系统研究整理">
-<meta property="og:url" content="http://bitky.cc/2016/04/15/android/index.html">
+<meta property="og:url" content="http://bitky.cc/2016/04/15/location/index.html">
 <meta property="og:site_name" content="比特麒麟">
-<meta property="og:description" content="本文由文末的参考链接整理、整合、修改而成  1. 电子地图坐标系统简介 WGS-84 坐标系：即地球坐标系，国际经纬度坐标标准 GCJ-02 坐标系：即火星坐标系，WGS84 坐标系经加密后的坐标系，国测局制定。 BD-09 坐标系：即百度坐标系，GCJ02 坐标系经加密后的坐标系。  GCJ-02 坐标系统，就是在标准的 WGS-84 坐标系统上进行了人为的偏移，比如 Google 地图、腾讯">
-<meta property="og:updated_time" content="2017-04-09T05:14:27.213Z">
+<meta property="og:description" content="电子地图坐标系统研究整理总汇。">
+<meta property="og:updated_time" content="2017-04-09T06:53:58.016Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="「转」电子地图坐标系统研究整理">
-<meta name="twitter:description" content="本文由文末的参考链接整理、整合、修改而成  1. 电子地图坐标系统简介 WGS-84 坐标系：即地球坐标系，国际经纬度坐标标准 GCJ-02 坐标系：即火星坐标系，WGS84 坐标系经加密后的坐标系，国测局制定。 BD-09 坐标系：即百度坐标系，GCJ02 坐标系经加密后的坐标系。  GCJ-02 坐标系统，就是在标准的 WGS-84 坐标系统上进行了人为的偏移，比如 Google 地图、腾讯">
+<meta name="twitter:description" content="电子地图坐标系统研究整理总汇。">
 
 
 
@@ -100,7 +100,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
     fancybox: false,
     motion: false,
     duoshuo: {
@@ -119,7 +119,7 @@
 
 
 
-  <link rel="canonical" href="http://bitky.cc/2016/04/15/android/"/>
+  <link rel="canonical" href="http://bitky.cc/2016/04/15/location/"/>
 
 
 
@@ -196,6 +196,26 @@
         </li>
       
         
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
@@ -244,7 +264,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/04/15/android/">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/04/15/location/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="雪中亮「123lml123」">
@@ -339,6 +359,10 @@
 
       
         <blockquote>
+<p>电子地图坐标系统研究整理总汇。</p>
+</blockquote>
+<a id="more"></a>
+<blockquote>
 <p>本文由文末的参考链接整理、整合、修改而成</p>
 </blockquote>
 <h1 id="1-电子地图坐标系统简介"><a href="#1-电子地图坐标系统简介" class="headerlink" title="1. 电子地图坐标系统简介"></a>1. 电子地图坐标系统简介</h1><ul>
@@ -461,8 +485,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/04/15/sublime/" rel="next" title="Sublime Text 3 基本配置教程">
-                <i class="fa fa-chevron-left"></i> Sublime Text 3 基本配置教程
+              <a href="/2016/06/04/qt/" rel="next" title="Qt 程序在 Windows 下的发布">
+                <i class="fa fa-chevron-left"></i> Qt 程序在 Windows 下的发布
               </a>
             
           </div>
@@ -471,8 +495,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/04/15/device/" rel="prev" title="「转」识别独立安卓设备">
-                「转」识别独立安卓设备 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/04/15/sublime/" rel="prev" title="Sublime Text 3 基本配置教程">
+                Sublime Text 3 基本配置教程 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -545,7 +569,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -555,10 +579,10 @@
             
             
             <div class="site-state-item site-state-categories">
-              
-                <span class="site-state-item-count">4</span>
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -566,10 +590,10 @@
             
             
             <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">20</span>
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
@@ -658,6 +682,11 @@
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -698,11 +727,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
   </div>

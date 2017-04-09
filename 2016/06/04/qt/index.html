@@ -81,13 +81,13 @@
 
 
 
-<meta name="description" content="本文讨论在 Windows 平台下编译成功的 Qt 程序，如何在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。 经过验证发现，在 Ubuntu 平台下编译成功的程序可在未安装 Qt 开发环境下的 Ubuntu16.04 中运行，所以，本文仅讨论，在 Windows 平台下编译成功的 Qt 程序，在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。 1. 编译模式选择">
+<meta name="description" content="本文讨论在 Windows 平台下编译成功的 Qt 程序，如何在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。">
 <meta name="keywords" content="C++,QT">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Qt 程序在 Windows 下的发布">
 <meta property="og:url" content="http://bitky.cc/2016/06/04/qt/index.html">
 <meta property="og:site_name" content="比特麒麟">
-<meta property="og:description" content="本文讨论在 Windows 平台下编译成功的 Qt 程序，如何在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。 经过验证发现，在 Ubuntu 平台下编译成功的程序可在未安装 Qt 开发环境下的 Ubuntu16.04 中运行，所以，本文仅讨论，在 Windows 平台下编译成功的 Qt 程序，在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。 1. 编译模式选择">
+<meta property="og:description" content="本文讨论在 Windows 平台下编译成功的 Qt 程序，如何在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-e70ab1436031e96a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-4914327e2b68e1c7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-7739077a505e4702.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
@@ -96,10 +96,10 @@
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-10484e100e40ee3f.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-dba69eaa834ea797.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-6d3b68fb05ddee95.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-04-09T05:17:52.825Z">
+<meta property="og:updated_time" content="2017-04-09T06:33:43.259Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Qt 程序在 Windows 下的发布">
-<meta name="twitter:description" content="本文讨论在 Windows 平台下编译成功的 Qt 程序，如何在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。 经过验证发现，在 Ubuntu 平台下编译成功的程序可在未安装 Qt 开发环境下的 Ubuntu16.04 中运行，所以，本文仅讨论，在 Windows 平台下编译成功的 Qt 程序，在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。 1. 编译模式选择">
+<meta name="twitter:description" content="本文讨论在 Windows 平台下编译成功的 Qt 程序，如何在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。">
 <meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-e70ab1436031e96a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
@@ -109,7 +109,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
     fancybox: false,
     motion: false,
     duoshuo: {
@@ -201,6 +201,26 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -348,6 +368,7 @@
 
       
         <p>本文讨论在 Windows 平台下编译成功的 Qt 程序，如何在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。</p>
+<a id="more"></a>
 <p>经过验证发现，在 Ubuntu 平台下编译成功的程序可在未安装 Qt 开发环境下的 Ubuntu16.04 中运行，所以，本文仅讨论，在 Windows 平台下编译成功的 Qt 程序，在未配置 Qt 开发环境的 Windows 平台下独立运行的方法。</p>
 <h1 id="1-编译模式选择"><a href="#1-编译模式选择" class="headerlink" title="1. 编译模式选择"></a>1. 编译模式选择</h1><p>如若想要发布程序，在 IDE 中编译一定要选择 <code>release</code> 而不是 <code>debug</code>，编译成 release 版本相比于 debug 版本，程序体积「可执行文件和 dll 文件」大大减小；</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/1555570-e70ab1436031e96a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="编译模式选择"></p>
@@ -466,8 +487,8 @@ plugins/accessible/qtaccessiblewidgets.dll
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/04/15/sublime/" rel="prev" title="Sublime Text 3 基本配置教程">
-                Sublime Text 3 基本配置教程 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/04/15/location/" rel="prev" title="「转」电子地图坐标系统研究整理">
+                「转」电子地图坐标系统研究整理 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -540,7 +561,7 @@ plugins/accessible/qtaccessiblewidgets.dll
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -550,10 +571,10 @@ plugins/accessible/qtaccessiblewidgets.dll
             
             
             <div class="site-state-item site-state-categories">
-              
-                <span class="site-state-item-count">4</span>
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -561,10 +582,10 @@ plugins/accessible/qtaccessiblewidgets.dll
             
             
             <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">20</span>
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
@@ -653,6 +674,11 @@ plugins/accessible/qtaccessiblewidgets.dll
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -693,11 +719,6 @@ plugins/accessible/qtaccessiblewidgets.dll
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
   </div>

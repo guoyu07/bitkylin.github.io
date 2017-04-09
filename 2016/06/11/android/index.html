@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="「注」本文可能已过时。  1. 获取 Volley在 Git 中使用如下命令： 1git clone https://android.googlesource.com/platform/frameworks/volley 2. 传统风格库源码打包为 Jar 文件2.1 配置 Ant 环境变量Ant 是一个将软件编译、测试、部署等步骤联系在一起加以自动化的一个工具，大多用于 Java 环境中的软件">
+<meta name="description" content="传统风格以及 Gradle 的第三方开源库，导入 Android Studio 工程的方法总结。  「注」 本文可能已过时。">
 <meta name="keywords" content="Java,Android,Ant">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android Studio 第三方库的导入「以 Volley 为例」">
 <meta property="og:url" content="http://bitky.cc/2016/06/11/android/index.html">
 <meta property="og:site_name" content="比特麒麟">
-<meta property="og:description" content="「注」本文可能已过时。  1. 获取 Volley在 Git 中使用如下命令： 1git clone https://android.googlesource.com/platform/frameworks/volley 2. 传统风格库源码打包为 Jar 文件2.1 配置 Ant 环境变量Ant 是一个将软件编译、测试、部署等步骤联系在一起加以自动化的一个工具，大多用于 Java 环境中的软件">
-<meta property="og:updated_time" content="2017-04-09T05:20:16.226Z">
+<meta property="og:description" content="传统风格以及 Gradle 的第三方开源库，导入 Android Studio 工程的方法总结。  「注」 本文可能已过时。">
+<meta property="og:updated_time" content="2017-04-09T06:31:19.526Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android Studio 第三方库的导入「以 Volley 为例」">
-<meta name="twitter:description" content="「注」本文可能已过时。  1. 获取 Volley在 Git 中使用如下命令： 1git clone https://android.googlesource.com/platform/frameworks/volley 2. 传统风格库源码打包为 Jar 文件2.1 配置 Ant 环境变量Ant 是一个将软件编译、测试、部署等步骤联系在一起加以自动化的一个工具，大多用于 Java 环境中的软件">
+<meta name="twitter:description" content="传统风格以及 Gradle 的第三方开源库，导入 Android Studio 工程的方法总结。  「注」 本文可能已过时。">
 
 
 
@@ -100,7 +100,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
     fancybox: false,
     motion: false,
     duoshuo: {
@@ -192,6 +192,26 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -338,9 +358,11 @@
       
 
       
-        <blockquote>
-<p><strong>「注」</strong>本文可能已过时。</p>
+        <p>传统风格以及 Gradle 的第三方开源库，导入 Android Studio 工程的方法总结。</p>
+<blockquote>
+<p><strong>「注」</strong> 本文可能已过时。</p>
 </blockquote>
+<a id="more"></a>
 <h1 id="1-获取-Volley"><a href="#1-获取-Volley" class="headerlink" title="1. 获取 Volley"></a>1. 获取 Volley</h1><p>在 Git 中使用如下命令：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https://android.googlesource.com/platform/frameworks/volley</div></pre></td></tr></table></figure>
 <h1 id="2-传统风格库源码打包为-Jar-文件"><a href="#2-传统风格库源码打包为-Jar-文件" class="headerlink" title="2. 传统风格库源码打包为 Jar 文件"></a>2. 传统风格库源码打包为 Jar 文件</h1><h2 id="2-1-配置-Ant-环境变量"><a href="#2-1-配置-Ant-环境变量" class="headerlink" title="2.1 配置 Ant 环境变量"></a>2.1 配置 Ant 环境变量</h2><p>Ant 是一个将软件编译、测试、部署等步骤联系在一起加以自动化的一个工具，大多用于 Java 环境中的软件开发。在实际软件开发中，有很多地方可以用到 Ant 。以下 Ant 的配置方法：</p>
@@ -503,7 +525,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -513,10 +535,10 @@
             
             
             <div class="site-state-item site-state-categories">
-              
-                <span class="site-state-item-count">4</span>
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -524,10 +546,10 @@
             
             
             <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">20</span>
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
                 <span class="site-state-item-name">标签</span>
-              
+              </a>
             </div>
           
 
@@ -616,6 +638,11 @@
       
 
       
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
 
     </div>
   </aside>
@@ -656,11 +683,6 @@
       </div>
     </footer>
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
     
 
   </div>

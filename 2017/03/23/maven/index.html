@@ -1,0 +1,855 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Maven,InteliJ IDEA," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Maven 是基于项目对象模型「POM」，可以通过一小段描述信息来管理项目的构建、报告和文档的软件项目管理工具。本文总结了 Maven 的基本用法。">
+<meta name="keywords" content="Java,Maven,InteliJ IDEA">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 Maven 构建 Java 项目">
+<meta property="og:url" content="http://bitky.cc/2017/03/23/maven/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="Maven 是基于项目对象模型「POM」，可以通过一小段描述信息来管理项目的构建、报告和文档的软件项目管理工具。本文总结了 Maven 的基本用法。">
+<meta property="og:updated_time" content="2017-04-09T06:46:59.610Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用 Maven 构建 Java 项目">
+<meta name="twitter:description" content="Maven 是基于项目对象模型「POM」，可以通过一小段描述信息来管理项目的构建、报告和文档的软件项目管理工具。本文总结了 Maven 的基本用法。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2017/03/23/maven/"/>
+
+
+
+
+
+  <title> 使用 Maven 构建 Java 项目 | 比特麒麟 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2017/03/23/maven/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                使用 Maven 构建 Java 项目
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-23T12:57:47+08:00">
+                2017-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>Maven 是基于项目对象模型「POM」，可以通过一小段描述信息来管理项目的构建、报告和文档的软件项目管理工具。本文总结了 Maven 的基本用法。</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="1-Maven-基本配置"><a href="#1-Maven-基本配置" class="headerlink" title="1. Maven 基本配置"></a>1. Maven 基本配置</h1><h2 id="1-1-环境变量"><a href="#1-1-环境变量" class="headerlink" title="1.1 环境变量"></a>1.1 环境变量</h2><p>环境变量中添加「M2_HOME」为 maven 主目录</p>
+<p>在 path 中添加「;%M2_HOME%\bin」</p>
+<h2 id="1-2-使用-Maven-阿里云中央仓库"><a href="#1-2-使用-Maven-阿里云中央仓库" class="headerlink" title="1.2 使用 Maven 阿里云中央仓库"></a>1.2 使用 Maven 阿里云中央仓库</h2><p>修改 Maven 根目录下 conf 文件夹中的 <code>setting.xml</code> 文件，内容如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">mirrors</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">mirror</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>alimaven<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>aliyun maven<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.aliyun.com/nexus/content/groups/public/<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span>central<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">mirrors</span>&gt;</span></div></pre></td></tr></table></figure>
+<h1 id="2-创建基于-Maven-的-Java-项目"><a href="#2-创建基于-Maven-的-Java-项目" class="headerlink" title="2. 创建基于 Maven 的 Java 项目"></a>2. 创建基于 Maven 的 Java 项目</h1><h2 id="2-1-使用命令行创建"><a href="#2-1-使用命令行创建" class="headerlink" title="2.1 使用命令行创建"></a>2.1 使用命令行创建</h2><p>Maven 使用原型「archetype」插件创建工程。要创建一个简单的 Java 应用，我们将使用 maven-archetype-quickstart 插件。</p>
+<p>Maven 创建目录有两种方式：「archetype 可自动创建目录骨架」</p>
+<ul>
+<li>在 cmd 中直接执行「mvn archetype:generate」按照提示进行选择，选择如下 Archetype：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">943: remote -&gt; org.apache.maven.archetypes:maven-archetype-quickstart (An archetype which contains a sample Maven project.)</div></pre></td></tr></table></figure>
+<ul>
+<li>使用单行命令创建项目，命令格式如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mvn archetype:generate </div><div class="line"> -DgourpId = 组织名，公司网址的反写 + 项目名称</div><div class="line"> -DartifactId=项目名-模块名</div><div class="line"> -Dversion=版本号</div><div class="line"> -Dpackage=代码所在的包名</div></pre></td></tr></table></figure>
+<p>示例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">mvn archetype:generate</div><div class="line"> -DgroupId=cc.bitky.demo</div><div class="line"> -DartifactId=demo-module</div><div class="line"> -Dversion=1.0.0-SNAPSHOT</div><div class="line"> -Dpackage=cc.bitky.demo.module</div><div class="line">``` </div><div class="line"></div><div class="line">## 2.2 使用InteliJ IDEA 创建</div><div class="line"></div><div class="line">- 在 InteliJ IDEA 中创建基础的示例 Maven 项目，依旧选择：</div></pre></td></tr></table></figure></p>
+<p>org.apache.maven.archetypes:maven-archetype-quickstart<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">如图所示：</div><div class="line"></div><div class="line">![Maven Quickstart Archetype](http://upload-images.jianshu.io/upload_images/1555570-b5982c9937203085.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)</div><div class="line"></div><div class="line"># 3. 目录结构</div><div class="line"></div><div class="line">## 3.1 Maven 项目的目录结构</div><div class="line"></div><div class="line">在 Maven 项目的根目录下，有如下必要的目录结构:</div><div class="line"></div><div class="line">&gt; - src</div><div class="line">&gt;   - main</div><div class="line">&gt;     - resources「存放一些资源文件」</div><div class="line">&gt;     - java</div><div class="line">&gt;       - package「自定义的包」</div><div class="line">&gt;   - test</div><div class="line">&gt;     - resources「存放一些资源文件」</div><div class="line">&gt;     - java</div><div class="line">&gt;       - package</div><div class="line">&gt; - pom.xml</div><div class="line"></div><div class="line">如下图所示：</div><div class="line"></div><div class="line">![Maven 项目的目录结构](http://upload-images.jianshu.io/upload_images/1555570-9f3d8f475ab10f2d.jpg)</div><div class="line"></div><div class="line">## 3.2 项目根目录下「pom.xml」的典型结构：</div><div class="line"></div><div class="line">``` xml</div><div class="line">&lt;project </div><div class="line">  xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; </div><div class="line">  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;</div><div class="line">  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;     &lt;!--&gt;maven版本&lt;/--&gt;</div><div class="line">  &lt;groupId&gt;cc.bitky.demo&lt;/groupId&gt;       &lt;!--&gt;项目的包名&lt;/--&gt;</div><div class="line">  &lt;artifactId&gt;demo-module&lt;/artifactId&gt;   &lt;!--&gt;模块名&lt;/--&gt;</div><div class="line">  &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;      &lt;!--&gt;版本&lt;/--&gt;</div><div class="line">  &lt;packaging&gt;jar&lt;/packaging&gt;</div><div class="line">  &lt;name&gt;demo-module&lt;/name&gt;</div><div class="line">  &lt;url&gt;http://maven.apache.org&lt;/url&gt;</div><div class="line">  &lt;properties&gt;</div><div class="line">    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;</div><div class="line">  &lt;/properties&gt;</div><div class="line">  &lt;!-- 依赖项 --&gt;</div><div class="line">  &lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">      &lt;groupId&gt;junit&lt;/groupId&gt;</div><div class="line">      &lt;artifactId&gt;junit&lt;/artifactId&gt;</div><div class="line">      &lt;version&gt;3.8.1&lt;/version&gt;</div><div class="line">      &lt;scope&gt;test&lt;/scope&gt;</div><div class="line">      &lt;!-- 排除依赖传递列表 --&gt;</div><div class="line">      &lt;exclusions&gt;</div><div class="line">        &lt;exclusion&gt;&lt;/exclusion&gt;</div><div class="line">      &lt;/exclusions&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">  &lt;/dependencies&gt;</div><div class="line">  &lt;!-- 依赖的管理，一般定义在父模块中，由子模块去继承 --&gt;</div><div class="line">  &lt;dependencyManagement&gt;</div><div class="line">    &lt;dependencies&gt;</div><div class="line">      &lt;dependency&gt;&lt;/dependency&gt;</div><div class="line">    &lt;/dependencies&gt;</div><div class="line">  &lt;/dependencyManagement&gt;</div><div class="line">  &lt;!-- 对构建行为提供相应的支持 --&gt;</div><div class="line">  &lt;build&gt;</div><div class="line">    &lt;!-- 插件列表 --&gt;</div><div class="line">    &lt;plugins&gt;</div><div class="line">      &lt;plugin&gt;</div><div class="line">        &lt;!-- 指定坐标 --&gt;</div><div class="line">        &lt;groupId&gt;&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;&lt;/version&gt;</div><div class="line">      &lt;/plugin&gt;</div><div class="line">    &lt;/plugins&gt;</div><div class="line">  &lt;/build&gt;</div><div class="line">  &lt;!-- 一般在子模块中指定所继承的父模块 --&gt;</div><div class="line">  &lt;parent&gt;&lt;/parent&gt;</div><div class="line">  &lt;!-- 模块列表 --&gt;</div><div class="line">  &lt;modules&gt;</div><div class="line">    &lt;module&gt;&lt;/module&gt;</div><div class="line">  &lt;/modules&gt;</div><div class="line">&lt;/project&gt;</div></pre></td></tr></table></figure></p>
+<h1 id="4-Maven-操作"><a href="#4-Maven-操作" class="headerlink" title="4. Maven 操作"></a>4. Maven 操作</h1><h2 id="4-1-构建命令"><a href="#4-1-构建命令" class="headerlink" title="4.1 构建命令"></a>4.1 构建命令</h2><ul>
+<li>mvn -v 版本。</li>
+<li>mvn compile 编译。</li>
+<li>mvn test 测试。</li>
+<li>mvn package 打包。</li>
+<li>mvn clean 清除maven生成的target目录。</li>
+<li>mvn install 将生成的jar安装到本地仓库中。</li>
+</ul>
+<blockquote>
+<ul>
+<li>mvn compile: 编译主程序源代码，不会编译test目录的源代码。第一次运行时，会下载相关的依赖包，可能会比较费时</li>
+<li>mvn test: 运行应用程序中的单元测试，会生成 target 文件夹：<ul>
+<li>主程序编译的字节码文件在 classes 下面</li>
+<li>测试程序放在 test-classes 下</li>
+<li>所生成的测试报告放在 surefire-reports 文件夹下</li>
+</ul>
+</li>
+<li>mvn package 会在target目录下生成 Jar 包，如「maven01-model-0.0.1SNAPSHPT.jar」</li>
+</ul>
+</blockquote>
+<h2 id="4-2-生命周期"><a href="#4-2-生命周期" class="headerlink" title="4.2 生命周期"></a>4.2 生命周期</h2><p>Maven的生命周期大概如下，这几个命令对应了一个项目的完整的构建过程，这几个步骤对应的都有插件来完成：</p>
+<ul>
+<li>clean 「清理」</li>
+<li>compile 「编译」</li>
+<li>test 「测试」</li>
+<li>package 「打包」</li>
+<li>install「安装到本地库」</li>
+</ul>
+<p>Maven的生命周期分为三个独立的生命周期（每一个生命周期有分为若干个阶段，其中defaul是最核心的一个）：</p>
+<ol>
+<li>clean「清理项目」</li>
+<li>default「构建项目」</li>
+<li>site「生成项目的站点」</li>
+</ol>
+<h3 id="4-2-1-clean「清理项目」"><a href="#4-2-1-clean「清理项目」" class="headerlink" title="4.2.1 clean「清理项目」"></a>4.2.1 clean「清理项目」</h3><ul>
+<li>pre-clean 「执行清理前的工作」</li>
+<li>clean「清理上一次构建生成的所有文件」</li>
+<li>post-clean「执行清理后的文件」</li>
+</ul>
+<h3 id="4-2-2-default「构建项目」（最核心）"><a href="#4-2-2-default「构建项目」（最核心）" class="headerlink" title="4.2.2 default「构建项目」（最核心）"></a>4.2.2 default「构建项目」（最核心）</h3><ul>
+<li>compile 「编译」</li>
+<li>test 「测试」</li>
+<li>package 「打包」</li>
+<li>install「安装到本地库」</li>
+</ul>
+<h3 id="4-2-3-site「生成项目站点」"><a href="#4-2-3-site「生成项目站点」" class="headerlink" title="4.2.3 site「生成项目站点」"></a>4.2.3 site「生成项目站点」</h3><ul>
+<li>pre-site「在生成项目站点之前要完成的工作」</li>
+<li>site「生成项目的站点文档」</li>
+<li>post-site「在生成项目站点后要完成的工作」</li>
+<li>site-deploy「发布生成的站点到服务器上」</li>
+</ul>
+<p><strong>注意</strong></p>
+<ul>
+<li>每个独立的生命周期，只需执行其中一个命令，此时会从该生命周期的开始命令顺序执行到该命令。</li>
+<li>Maven的生命周期对应的命令是顺序执行的，如果没有人为的顺序的一个个执行，那么Maven会默认的自动运行。</li>
+<li>如执行「mvn clean test」,则此时会顺序执行「pre-clean clean post-clean compile test」</li>
+<li>如执行「mvn test」,则此时会顺序执行「compile test」</li>
+</ul>
+<h1 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5. 参考资料"></a>5. 参考资料</h1><ol>
+<li><a href="http://wiki.jikexueyuan.com/project/maven/" target="_blank" rel="external">Maven 教程 - 「极客学院 Wiki」</a></li>
+<li><a href="http://www.imooc.com/learn/443" target="_blank" rel="external">项目管理利器 — maven「慕课网」</a></li>
+</ol>
+<blockquote>
+<p><strong>「镜像博客」</strong><a href="http://blog.csdn.net/llmmll08/article/details/64450713" target="_blank" rel="external">CSDN </a></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Maven/" rel="tag"># Maven</a>
+          
+            <a href="/tags/InteliJ-IDEA/" rel="tag"># InteliJ IDEA</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/26/website/" rel="next" title="为你的简书和 GitHub 设定个性域名">
+                <i class="fa fa-chevron-left"></i> 为你的简书和 GitHub 设定个性域名
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/18/okhttp/" rel="prev" title="关于 OkHttp 依赖冲突问题的解决过程">
+                关于 OkHttp 依赖冲突问题的解决过程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-csdn"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Maven-基本配置"><span class="nav-number">1.</span> <span class="nav-text">1. Maven 基本配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-环境变量"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 环境变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-使用-Maven-阿里云中央仓库"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 使用 Maven 阿里云中央仓库</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-创建基于-Maven-的-Java-项目"><span class="nav-number">2.</span> <span class="nav-text">2. 创建基于 Maven 的 Java 项目</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-使用命令行创建"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 使用命令行创建</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Maven-操作"><span class="nav-number">3.</span> <span class="nav-text">4. Maven 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-构建命令"><span class="nav-number">3.1.</span> <span class="nav-text">4.1 构建命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-生命周期"><span class="nav-number">3.2.</span> <span class="nav-text">4.2 生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-1-clean「清理项目」"><span class="nav-number">3.2.1.</span> <span class="nav-text">4.2.1 clean「清理项目」</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-2-default「构建项目」（最核心）"><span class="nav-number">3.2.2.</span> <span class="nav-text">4.2.2 default「构建项目」（最核心）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-3-site「生成项目站点」"><span class="nav-number">3.2.3.</span> <span class="nav-text">4.2.3 site「生成项目站点」</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-参考资料"><span class="nav-number">4.</span> <span class="nav-text">5. 参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,869 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Android,Gradle,OkHttp," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="OkHttp 是一个流行的开源网络请求库。许多第三方库的底层都是使用 OkHttp 实现网络请求，所以 OkHttp 相关的依赖冲突问题就变得很难避免，下文是我所遇到的一次关于 OkHttp 的依赖冲突问题，通过对 Gradle 工具及 Android Studio 的灵活使用，解决了此问题。">
+<meta name="keywords" content="Java,Android,Gradle,OkHttp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于 OkHttp 依赖冲突问题的解决过程">
+<meta property="og:url" content="http://bitky.cc/2016/11/18/okhttp/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="OkHttp 是一个流行的开源网络请求库。许多第三方库的底层都是使用 OkHttp 实现网络请求，所以 OkHttp 相关的依赖冲突问题就变得很难避免，下文是我所遇到的一次关于 OkHttp 的依赖冲突问题，通过对 Gradle 工具及 Android Studio 的灵活使用，解决了此问题。">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-30008a09d24fac58.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-fb9839efc1647a17.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-b3302c60b8b81ee3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-04-09T06:43:15.896Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于 OkHttp 依赖冲突问题的解决过程">
+<meta name="twitter:description" content="OkHttp 是一个流行的开源网络请求库。许多第三方库的底层都是使用 OkHttp 实现网络请求，所以 OkHttp 相关的依赖冲突问题就变得很难避免，下文是我所遇到的一次关于 OkHttp 的依赖冲突问题，通过对 Gradle 工具及 Android Studio 的灵活使用，解决了此问题。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-30008a09d24fac58.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2016/11/18/okhttp/"/>
+
+
+
+
+
+  <title> 关于 OkHttp 依赖冲突问题的解决过程 | 比特麒麟 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/11/18/okhttp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                关于 OkHttp 依赖冲突问题的解决过程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-11-18T12:57:47+08:00">
+                2016-11-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>OkHttp 是一个流行的开源网络请求库。许多第三方库的底层都是使用 OkHttp 实现网络请求，所以 OkHttp 相关的依赖冲突问题就变得很难避免，下文是我所遇到的一次关于 OkHttp 的依赖冲突问题，通过对 Gradle 工具及 Android Studio 的灵活使用，解决了此问题。</p>
+<a id="more"></a>
+<h1 id="1-关于-OkHttp-的依赖冲突"><a href="#1-关于-OkHttp-的依赖冲突" class="headerlink" title="1. 关于 OkHttp 的依赖冲突"></a>1. 关于 OkHttp 的依赖冲突</h1><p>我的项目中， build.gradle 文件中设置的主要依赖：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">dependencies</span> &#123;</div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.android.support:appcompat-v7:24.0.0'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'cn.bmob.android:bmob-sdk:3.5.2'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.squareup.okhttp3:okhttp:3.4.2'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.facebook.fresco:imagepipeline-okhttp3:0.12.0'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.facebook.fresco:fresco:0.12.0'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在写该 App 的过程中，出现了较为诡异的情况：</p>
+<ul>
+<li>使用 Run ‘app’ 命令可以在 Android 6.0「API 23」环境中成功运行 App</li>
+<li>使用 Run ‘app’ 命令针对 Android 4.4「API 19」环境的虚拟机，进行 Gradle 构建时报错</li>
+<li>使用「Generate Signed APK」，在进行 Gradle 构建时报错</li>
+<li>在 cmd 或 Windows PowerShell 中执行如下 Gradle 指令：</li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">gradle clean</div><div class="line">gradle build</div></pre></td></tr></table></figure>
+<p>报错，所报错误分别如下 :</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Error:Error converting bytecode to dex:</div><div class="line">Cause: com.android.dex.DexException: Multiple dex files define Lokhttp3/Address;</div><div class="line"></div><div class="line">Error:Execution failed for task ':app:transformClassesWithDexForDebug'.</div><div class="line">&gt; com.android.build.api.transform.TransformException: com.android.ide.common.process.ProcessException: java.util.concurrent.ExecutionException: java.lang.UnsupportedOperationException</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">:app:transformClassesWithDexForDebug FAILED</div><div class="line"></div><div class="line">FAILURE: Build failed with an exception.</div><div class="line"></div><div class="line">* What went wrong:</div><div class="line">Execution failed for task &apos;:app:transformClassesWithDexForDebug&apos;.</div><div class="line">&gt; com.android.build.api.transform.TransformException: com.android.ide.common.process.ProcessException: java.util.concurrent.ExecutionException: java.lang.Unsu</div><div class="line">pportedOperationException</div><div class="line"></div><div class="line">* Try:</div><div class="line">Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.</div><div class="line"></div><div class="line">BUILD FAILED</div></pre></td></tr></table></figure>
+<p>通过打印的异常信息，可以确定问题是在于 OkHttp 的依赖冲突。</p>
+<h1 id="2-依赖冲突问题的探究"><a href="#2-依赖冲突问题的探究" class="headerlink" title="2. 依赖冲突问题的探究"></a>2. 依赖冲突问题的探究</h1><h2 id="2-1-使用-Gradle-工具对依赖冲突进行探究"><a href="#2-1-使用-Gradle-工具对依赖冲突进行探究" class="headerlink" title="2.1 使用 Gradle 工具对依赖冲突进行探究"></a>2.1 使用 Gradle 工具对依赖冲突进行探究</h2><blockquote>
+<p>Gradle 相关简介：</p>
+<p>「一」Gradle位置：</p>
+<ol>
+<li><p>C:\Users\&lt; 用户名 &gt;.gradle\wrapper\dists\gradle- &lt; 版本号 &gt; -all\&lt;一串识别码&gt;\gradle- &lt; 版本号 &gt; </p>
+</li>
+<li><p>&lt; Android Studio 目录 &gt; \gradle\gradle- &lt; 版本号 &gt; </p>
+</li>
+</ol>
+<p>「二」Gradle 环境变量配置：</p>
+<ol>
+<li><p>在环境变量里添加用户变量： GRADLE_HOME</p>
+</li>
+<li><p>在环境变量 path 中增加： %GRADLE_HOME%\bin;</p>
+</li>
+</ol>
+</blockquote>
+<p>此时，我直接使用 Gradle 工具检查此项目的依赖，进入项目目录，执行如下指令进行依赖检查：</p>
+<pre><code>cd app
+gradle dependencies
+</code></pre><p>打印出如下图所示的依赖树，依赖树显示了你 build 脚本声明的顶级依赖和它们的传递依赖：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-30008a09d24fac58.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="依赖树"></p>
+<p>箭头所指的地方为与 OkHttp 相关的库，从依赖树可知，我自行引入的 OkHttp 库替换掉了 Fresco 中的低版本库，但仍旧提示依赖冲突。</p>
+<p>经过多次尝试，发现只有同时去掉这两个对 OkHttp 的依赖时，问题得到解决，build.gradle 文件修改如下：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">dependencies</span> &#123;</div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.android.support:appcompat-v7:24.0.0'</span></div><div class="line">    <span class="keyword">compile</span> <span class="string">'cn.bmob.android:bmob-sdk:3.5.2'</span></div><div class="line">    <span class="comment">//compile 'com.squareup.okhttp3:okhttp:3.4.2'</span></div><div class="line">    <span class="keyword">compile</span>(<span class="string">'com.facebook.fresco:imagepipeline-okhttp3:0.12.0'</span>, &#123;</div><div class="line">        <span class="keyword">exclude</span> module: <span class="string">"okhttp"</span></div><div class="line">    &#125;)</div><div class="line">    <span class="keyword">compile</span> <span class="string">'com.facebook.fresco:fresco:0.12.0'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="2-2-对解决依赖冲突问题的尝试"><a href="#2-2-对解决依赖冲突问题的尝试" class="headerlink" title="2.2 对解决依赖冲突问题的尝试"></a>2.2 对解决依赖冲突问题的尝试</h2><p>这个问题很奇葩，去掉对 OkHttp 的依赖怎么可以呢？对着错误代码查遍了 Google 和 Stack Overflow，提到的解决方法有如下两条：</p>
+<h3 id="2-2-1-使用-Multidex-support-library-开启-Multidex-功能"><a href="#2-2-1-使用-Multidex-support-library-开启-Multidex-功能" class="headerlink" title="2.2.1 使用 Multidex support library 开启 Multidex 功能"></a>2.2.1 使用 Multidex support library 开启 Multidex 功能</h3><p>步骤 1：更改 build.grade</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">defaultConfig &#123;</div><div class="line">    ...</div><div class="line">    // Enabling multidex support.</div><div class="line">    multiDexEnabled true</div><div class="line">&#125;</div><div class="line"></div><div class="line">dependencies &#123;</div><div class="line">    ...</div><div class="line">    compile &apos;com.android.support:multidex:1.0.1&apos;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>步骤 2：设置 Application 类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public class MyApplication extends Application &#123;</div><div class="line">    @Override</div><div class="line">    public void onCreate() &#123;</div><div class="line">        super.onCreate();</div><div class="line">        MultiDex.install(this);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>步骤 3：更改 grade.properties</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">org.gradle.jvmargs=-XX:MaxHeapSize\=2048m -Xmx2048m</div></pre></td></tr></table></figure>
+<h3 id="2-2-2-通过增大可用内存解决「-app-transformClassesForDexForDebug」异常"><a href="#2-2-2-通过增大可用内存解决「-app-transformClassesForDexForDebug」异常" class="headerlink" title="2.2.2 通过增大可用内存解决「:app:transformClassesForDexForDebug」异常"></a>2.2.2 通过增大可用内存解决「:app:transformClassesForDexForDebug」异常</h3><p>在 gradle.build 中指定 javaMaxHeapSize：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">android &#123;</div><div class="line">    .</div><div class="line">    .</div><div class="line">    .</div><div class="line">    dexOptions &#123;</div><div class="line">        javaMaxHeapSize &quot;4g&quot; //specify the heap size for the dex process</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不过，这两种办法都无益于解决问题。</p>
+<h1 id="3-追根溯源解决依赖冲突"><a href="#3-追根溯源解决依赖冲突" class="headerlink" title="3. 追根溯源解决依赖冲突"></a>3. 追根溯源解决依赖冲突</h1><h2 id="3-1-问题的精确定位"><a href="#3-1-问题的精确定位" class="headerlink" title="3.1 问题的精确定位"></a>3.1 问题的精确定位</h2><p>通过中文搜索引擎搜索之后，在一篇文章中获得了灵感：</p>
+<blockquote>
+<p>对于如下异常：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&gt; 2.Execution failed for task &apos;:app:transformClassesWithJarMergingForDebug&apos;.</div><div class="line">&gt; </div><div class="line">&gt; com.android.build.api.transform.TransformException: </div><div class="line">&gt; java.util.zip.ZipException: duplicate</div><div class="line">&gt; entry: android/support/v4/app/BackStackState$1.class</div><div class="line">&gt;</div></pre></td></tr></table></figure></p>
+<p>原因：在所添加的 jar 包或 aar 包中也引用了 support-V4 , 与工程中引用的相冲突 </p>
+<p>Ctrl+N –&gt; 在搜索框中输入 BackStackState –&gt; 查找到所有引用该类的类，这些类即为引起冲突的类 </p>
+<p>去掉本工程中 gradle 中用于引用有冲突的包的代码或者将冲突的代码从 jar 包或 aar 包中移除，确保一个 module 中只引用了一份相同的第三方包</p>
+</blockquote>
+<p>根据这份解决思路，进行问题的最终解决。</p>
+<p>首先获取如下异常的关键信息：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Error:Error converting bytecode to dex:</div><div class="line">Cause: com.android.dex.DexException: Multiple dex files define Lokhttp3<span class="regexp">/Address;</span></div></pre></td></tr></table></figure>
+<p>由异常信息可知，OkHttp 下的 Address 类有冲突，执行如下步骤：</p>
+<ul>
+<li><p>Ctrl + N </p>
+</li>
+<li><p>在搜索框中输入 Address </p>
+</li>
+<li><p>查找到所有引用该类的类</p>
+</li>
+</ul>
+<p>搜索到的内容，如下图所示。可知，Bmob 和 OkHttp 中均有该类。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-fb9839efc1647a17.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Address 类的搜索结果"></p>
+<h2 id="3-2-删掉冲突的-Jar-包"><a href="#3-2-删掉冲突的-Jar-包" class="headerlink" title="3.2 删掉冲突的 Jar 包"></a>3.2 删掉冲突的 Jar 包</h2><p>将项目的显示树由 Android 切换到 Project，查看 Bmob 的 Jar 包的结构，发现其中依赖了一个 OkHttp 的 Jar 包。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-b3302c60b8b81ee3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="依赖的 Jar 包查询"></p>
+<p>由于使用了 Gradle 的远程依赖形式，故直接删除冲突的内容无效，须转为使用本地依赖的形式。</p>
+<p>根据 Bmob 官方文档的指示，删除 Bmob 的 Maven 仓库依赖，使用本地 Jar 包形式的依赖，去除对 OkHttp 的 Jar 包的引用，即可顺利解决问题。当然也可以只使用 Bmob 的远程依赖而在 build.gradle 中去掉其他相关「如 OkHttp，Gson，RxJava 等」的依赖。</p>
+<h1 id="4-参考资料"><a href="#4-参考资料" class="headerlink" title="4. 参考资料"></a>4. 参考资料</h1><p><strong>问题预备</strong></p>
+<ol>
+<li><a href="http://blog.csdn.net/lmj623565791/article/details/47911083" target="_blank" rel="external">Android OkHttp 完全解析 是时候来了解 OkHttp 了</a></li>
+<li><a href="http://blog.csdn.net/lw_power/article/details/51241187" target="_blank" rel="external">Gradle 实战「1」 - 配置环境变量</a></li>
+<li><a href="http://www.ezlippi.com/blog/2015/05/gradle-dependency-management.html" target="_blank" rel="external">Gradle 系列教程之依赖管理</a></li>
+</ol>
+<p><strong>MultiDex</strong></p>
+<ol>
+<li><a href="http://blog.csdn.net/yzzst/article/details/48290701" target="_blank" rel="external">Android分包 MultiDex 原理详解</a></li>
+<li><a href="http://stackoverflow.com/a/38473900/6711470" target="_blank" rel="external">How to enable multidexing with the new Android Multidex support library</a></li>
+</ol>
+<p><strong>问题解决</strong></p>
+<ol>
+<li><a href="http://www.cnblogs.com/royi123/p/5378056.html" target="_blank" rel="external">Android Studio 编译中的一些问题解决办法</a></li>
+<li><a href="http://blog.csdn.net/cx1229/article/details/52786168" target="_blank" rel="external">Android Studio 中如何解决重复依赖导致的 app:transformClassesWithJarMergingForDebug</a></li>
+<li><a href="http://docs.bmob.cn/data/Android/a_faststart/doc/index.html#SDK%E5%AF%BC%E5%85%A5" target="_blank" rel="external">Bmob的开发文档</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Gradle/" rel="tag"># Gradle</a>
+          
+            <a href="/tags/OkHttp/" rel="tag"># OkHttp</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/23/maven/" rel="next" title="使用 Maven 构建 Java 项目">
+                <i class="fa fa-chevron-left"></i> 使用 Maven 构建 Java 项目
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/16/website/" rel="prev" title="基于 LNMP 搭建个人网站的填坑之旅">
+                基于 LNMP 搭建个人网站的填坑之旅 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-csdn"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-关于-OkHttp-的依赖冲突"><span class="nav-number">1.</span> <span class="nav-text">1. 关于 OkHttp 的依赖冲突</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-依赖冲突问题的探究"><span class="nav-number">2.</span> <span class="nav-text">2. 依赖冲突问题的探究</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-使用-Gradle-工具对依赖冲突进行探究"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 使用 Gradle 工具对依赖冲突进行探究</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-对解决依赖冲突问题的尝试"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 对解决依赖冲突问题的尝试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1-使用-Multidex-support-library-开启-Multidex-功能"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 使用 Multidex support library 开启 Multidex 功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-通过增大可用内存解决「-app-transformClassesForDexForDebug」异常"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 通过增大可用内存解决「:app:transformClassesForDexForDebug」异常</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-追根溯源解决依赖冲突"><span class="nav-number">3.</span> <span class="nav-text">3. 追根溯源解决依赖冲突</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-问题的精确定位"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 问题的精确定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-删掉冲突的-Jar-包"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 删掉冲突的 Jar 包</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-参考资料"><span class="nav-number">4.</span> <span class="nav-text">4. 参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
