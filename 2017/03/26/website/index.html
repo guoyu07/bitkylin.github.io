@@ -94,7 +94,7 @@
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-725b6f3438c78fa8.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-4ded4bd42f052b68.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-e7f87fd4953930e7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-04-09T06:51:19.409Z">
+<meta property="og:updated_time" content="2017-04-11T02:31:17.750Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="为你的简书和 GitHub 设定个性域名">
 <meta name="twitter:description" content="为你的简书和 GitHub 设定个性的二级域名。">
@@ -416,12 +416,13 @@
 <p>只有当欲跳转网页的主域名在万网托管，并且有备案时，该方法才能使用，不然进行配置时，会有如下错误提示：</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/1555570-f07fe23dbd99d9e2.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="在万网未查询到 GitHub 的备案号"></p>
 <h1 id="2-使用-CNAME-记录设置二级域名"><a href="#2-使用-CNAME-记录设置二级域名" class="headerlink" title="2. 使用 CNAME 记录设置二级域名"></a>2. 使用 CNAME 记录设置二级域名</h1><blockquote>
-<p><strong>CNAME 记录</strong><br>如果将域名指向一个域名，实现与被指向域名相同的访问效果，需要增加CNAME记录。</p>
+<p><strong>CNAME 记录</strong><br>如果将域名指向一个域名，实现与被指向域名相同的访问效果，需要增加 CNAME 记录。</p>
 </blockquote>
 <p><a href="https://github.com/bitkylin" target="_blank" rel="external"> GitHub </a>和<a href="https://coding.net/u/bitky" target="_blank" rel="external"> 码云 </a>均提供免费的静态网页托管服务，由于码云是国内网站，访问速度会快一些，稳定一些。</p>
 <p>打开码云，新建项目，在项目的主页面点击「新建文件」</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/1555570-725b6f3438c78fa8.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="「码云」项目主页面"></p>
-<p>设置新建的文件，文件名为「index.html」，内容为：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></div><div class="line">        window.location.href="https://github.com/bitkylin";</div><div class="line">        //location.replace("https://github.com/bitkylin") 「可使用本行代码替换掉上一行代码，且实现效果一致」</div><div class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>设置新建的文件，文件名为「index.html」，内容为：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined"></span></div><div class="line">        window.location.href="https://github.com/bitkylin";</div><div class="line">        //location.replace("https://github.com/bitkylin") 「可使用本行代码替换掉上一行代码，且实现效果一致」</div><div class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure>
 <p>然后进行提交，之后切换到「Pages 服务」页面，进行如下操作</p>
 <ol>
 <li>「部署来源」选择「master 分支」，点击保存。</li>
