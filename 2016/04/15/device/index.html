@@ -88,7 +88,7 @@
 <meta property="og:url" content="http://bitky.cc/2016/04/15/device/index.html">
 <meta property="og:site_name" content="比特麒麟">
 <meta property="og:description" content="通过生成唯一的识别码，识别独立的安卓手机的几种方法  本文转载自：难题：识别独立安卓设备 - 「A WING BY WIND」">
-<meta property="og:updated_time" content="2017-04-09T06:54:19.391Z">
+<meta property="og:updated_time" content="2017-04-11T04:34:36.070Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="「转」识别独立安卓设备">
 <meta name="twitter:description" content="通过生成唯一的识别码，识别独立的安卓手机的几种方法  本文转载自：难题：识别独立安卓设备 - 「A WING BY WIND」">
@@ -364,9 +364,9 @@
 </blockquote>
 <a id="more"></a>
 <p>今天碰巧朋友问到我怎么识别独立的安卓手机，就花了一些时间琢磨了一下。其实这个问题可以秒答，就是 IMEI 。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">TelephonyManager.getDeviceId();</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">TelephonyManager.getDeviceId();</div></pre></td></tr></table></figure>
 <p>这需要一个权限：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;uses-permission android:name=&quot;android.permission.READ_PHONE_STATE&quot; /&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.READ_PHONE_STATE"</span> /&gt;</span></div></pre></td></tr></table></figure>
 <p>问题如果这么简单就好了，问题在于：</p>
 <ul>
 <li>平板等其他设备，无 SIM 卡，因此无 Telephony 模块。</li>
@@ -379,7 +379,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell getprop ro.serialno</div></pre></td></tr></table></figure>
 <p>代码中可使用系统变量 <code>android.os.Build.SERIAL</code> 访问。如果这个值能够取到这是仅次于 IMEI 的最好方法了。缺点是这个值在 2.2 及以下版本的 Android 系统不支持。不过好在如今的安卓世界 2.2 及以下的占有率已经越来越低了，翻新速度很快，因此这个值很值得一试。</p>
 <h1 id="3-Android-ID"><a href="#3-Android-ID" class="headerlink" title="3. Android ID"></a>3. Android ID</h1><p>其实安卓系统提供了 <code>Settings.Secure.ANDROID_ID</code> 来获取唯一设备号。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">import android.provider.Settings.Secure;</div><div class="line"></div><div class="line">private String android_id = Secure.getString(</div><div class="line">                            getContext().getContentResolver(),</div><div class="line">                            Secure.ANDROID_ID);</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> android.provider.Settings.Secure;</div><div class="line"></div><div class="line"><span class="keyword">private</span> String android_id = Secure.getString(</div><div class="line">                            getContext().getContentResolver(),</div><div class="line">                            Secure.ANDROID_ID);</div></pre></td></tr></table></figure>
 <p>但同样 2.2 以前的系统支持得不好。这个值是系统初次启动后生成的，因此恢复出厂设置后这个值会变，导致观测到的设备数虚高。在手机刷机、重置频繁的环境，这个值是不靠谱的。另外某大厂生产的设备居然有个 BUG，这个值是会重复的「DROID2」，因此这个值还是别用为好。</p>
 <h1 id="4-Generated-UUID"><a href="#4-Generated-UUID" class="headerlink" title="4. Generated UUID"></a>4. Generated UUID</h1><p>最后还有一个自己生成 UUID 的办法，保存这个 ID，每次访问服务器时上传，自己告诉系统自己是谁。这个方法比所有硬件方法都更不靠谱，因为只需卸载软件和清理数据就会导致这个值被删除，从而产生新的 UUID，造成观测到的设备数量虚高。更别说刷机和恢复出厂设置了。这个方法非常适合用来统计软件安装次数，而非独立设备数。</p>
 <h1 id="5-结论"><a href="#5-结论" class="headerlink" title="5. 结论"></a>5. 结论</h1><p>综上所述，目前为止我还没找到非常完美的统计独立设备的方案，尤其是在中国这个水货、硬解、山寨、刷机市场泛滥和不规范的安卓世界，更是难上加难。</p>
@@ -431,8 +431,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/04/15/location/" rel="next" title="「转」电子地图坐标系统研究整理">
-                <i class="fa fa-chevron-left"></i> 「转」电子地图坐标系统研究整理
+              <a href="/2016/04/15/sublime/" rel="next" title="Sublime Text 3 基本配置教程">
+                <i class="fa fa-chevron-left"></i> Sublime Text 3 基本配置教程
               </a>
             
           </div>
