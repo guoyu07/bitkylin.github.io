@@ -824,9 +824,9 @@ gradle dependencies
       <category term="C#" scheme="http://bitky.cc/categories/C/"/>
     
     
-      <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
-    
       <category term="CSharp" scheme="http://bitky.cc/tags/CSharp/"/>
+    
+      <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
     
       <category term="SQLite" scheme="http://bitky.cc/tags/SQLite/"/>
     
@@ -864,9 +864,9 @@ gradle dependencies
     
       <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
     
-      <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
-    
       <category term="CSharp" scheme="http://bitky.cc/tags/CSharp/"/>
+    
+      <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
     
       <category term="计划任务" scheme="http://bitky.cc/tags/%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1/"/>
     
@@ -1235,58 +1235,48 @@ plugins/accessible/qtaccessiblewidgets.dll
   </entry>
   
   <entry>
-    <title>「转」识别独立安卓设备</title>
-    <link href="http://bitky.cc/2016/04/15/device/"/>
-    <id>http://bitky.cc/2016/04/15/device/</id>
+    <title>Sublime Text 3 基本配置教程</title>
+    <link href="http://bitky.cc/2016/04/15/sublime/"/>
+    <id>http://bitky.cc/2016/04/15/sublime/</id>
     <published>2016-04-15T04:57:47.000Z</published>
-    <updated>2017-04-11T04:34:36.070Z</updated>
+    <updated>2017-04-09T06:34:13.207Z</updated>
     
-    <content type="html"><![CDATA[<p>通过生成唯一的识别码，识别独立的安卓手机的几种方法</p>
-<blockquote>
-<p><strong>本文转载自</strong>：<a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/" target="_blank" rel="external">难题：识别独立安卓设备 - 「A WING BY WIND」</a></p>
-</blockquote>
+    <content type="html"><![CDATA[<p>以下链接是一篇很好的 Sublime Text 中文教程+配置教程</p>
 <a id="more"></a>
-<p>今天碰巧朋友问到我怎么识别独立的安卓手机，就花了一些时间琢磨了一下。其实这个问题可以秒答，就是 IMEI 。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">TelephonyManager.getDeviceId();</div></pre></td></tr></table></figure>
-<p>这需要一个权限：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.READ_PHONE_STATE"</span> /&gt;</span></div></pre></td></tr></table></figure>
-<p>问题如果这么简单就好了，问题在于：</p>
-<ul>
-<li>平板等其他设备，无 SIM 卡，因此无 Telephony 模块。</li>
-<li>有些设备恢复出厂设置的操作会清空 IMEI「水货硬解通常会导致这个结果」</li>
-<li>我国许多山寨手机厂商偷懒，刷机不改 IMEI，所以 IMEI 都是一样的</li>
-</ul>
-<p>因此其实问题从这里才开始。网上能够搜索到的解决方案有以下几点：</p>
-<h1 id="1-WIFI-MAC"><a href="#1-WIFI-MAC" class="headerlink" title="1. WIFI MAC"></a>1. WIFI MAC</h1><p>一个方案是优先采用 IMEI，当 IMEI 相同时，再比较 WIFI 的 MAC 地址。但如果手机没有 WIFI 功能或者 WIFI 功能没有开启「飞行模式」，则无法获取到 MAC 地址。更加让人惆怅的是，我国大山寨厂商实在是懒透了，无线网卡的 MAC 地址居然也不修改，不少自刷机的也是这病情「例如这个，这个还有这个」。至于说蓝牙 MAC 地址就更别说了。IMEI 重复的病因，与 MAC 地址相同的其实是一个原因，都是刷机或山寨，所以这「WIFI MAC」地址的方案其实算不上互补了，必须另谋途径。</p>
-<h1 id="2-Serial-NO"><a href="#2-Serial-NO" class="headerlink" title="2. Serial NO"></a>2. Serial NO</h1><p>另一个方案是用 serial NO 。这个值仅在 Android 2.3 版本以上才提供支持。通过 adb 可以这样查看：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell getprop ro.serialno</div></pre></td></tr></table></figure>
-<p>代码中可使用系统变量 <code>android.os.Build.SERIAL</code> 访问。如果这个值能够取到这是仅次于 IMEI 的最好方法了。缺点是这个值在 2.2 及以下版本的 Android 系统不支持。不过好在如今的安卓世界 2.2 及以下的占有率已经越来越低了，翻新速度很快，因此这个值很值得一试。</p>
-<h1 id="3-Android-ID"><a href="#3-Android-ID" class="headerlink" title="3. Android ID"></a>3. Android ID</h1><p>其实安卓系统提供了 <code>Settings.Secure.ANDROID_ID</code> 来获取唯一设备号。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> android.provider.Settings.Secure;</div><div class="line"></div><div class="line"><span class="keyword">private</span> String android_id = Secure.getString(</div><div class="line">                            getContext().getContentResolver(),</div><div class="line">                            Secure.ANDROID_ID);</div></pre></td></tr></table></figure>
-<p>但同样 2.2 以前的系统支持得不好。这个值是系统初次启动后生成的，因此恢复出厂设置后这个值会变，导致观测到的设备数虚高。在手机刷机、重置频繁的环境，这个值是不靠谱的。另外某大厂生产的设备居然有个 BUG，这个值是会重复的「DROID2」，因此这个值还是别用为好。</p>
-<h1 id="4-Generated-UUID"><a href="#4-Generated-UUID" class="headerlink" title="4. Generated UUID"></a>4. Generated UUID</h1><p>最后还有一个自己生成 UUID 的办法，保存这个 ID，每次访问服务器时上传，自己告诉系统自己是谁。这个方法比所有硬件方法都更不靠谱，因为只需卸载软件和清理数据就会导致这个值被删除，从而产生新的 UUID，造成观测到的设备数量虚高。更别说刷机和恢复出厂设置了。这个方法非常适合用来统计软件安装次数，而非独立设备数。</p>
-<h1 id="5-结论"><a href="#5-结论" class="headerlink" title="5. 结论"></a>5. 结论</h1><p>综上所述，目前为止我还没找到非常完美的统计独立设备的方案，尤其是在中国这个水货、硬解、山寨、刷机市场泛滥和不规范的安卓世界，更是难上加难。</p>
-<p>但是反过来想，是不是一台完全刷新，安装了全新的 ROM 的手机，就已经不是原来的那台手机了呢？统计独立设备数的目的究竟是什么？如果要的是独立活跃设备数，其实用自己生成的 UUID 已经足够，因为原来使用的那个 UUID 已经失去活性，可以忽略了。对于 APP 开发者而言这个情况与用户换了一台手机，完全弃用旧手机的情况其实是一样的。假如是采取活跃 UUID 的方式，则即使是使用 ANDROID_ID 或者自己生成的 UUID 都是可取的做法了。</p>
-<h1 id="6-文章来源："><a href="#6-文章来源：" class="headerlink" title="6. 文章来源："></a>6. 文章来源：</h1><ol>
-<li><a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/" target="_blank" rel="external">难题：识别独立安卓设备</a></li>
+<blockquote>
+<p><a href="http://lucida.me/blog/sublime-text-complete-guide/" target="_blank" rel="external">http://lucida.me/blog/sublime-text-complete-guide/</a></p>
+</blockquote>
+<h1 id="1-修改-Sublime-Text-的默认配置文件位置"><a href="#1-修改-Sublime-Text-的默认配置文件位置" class="headerlink" title="1. 修改 Sublime Text 的默认配置文件位置"></a>1. 修改 Sublime Text 的默认配置文件位置</h1><p>默认情况下安装完 Sublime Text 3 , 在第一次运行的时候 , Sublime Text 3 会在 %appdata% 目录下生成一个 Sublime Text 3 的文件夹，用于存放配置文件，以及后面安装的各种插件；为便于设置完后打包，建议将配置文件位置改到安装目录下。</p>
+<p>安装完 Sublime Text 3 后，不要直接运行找到 Sublime Text 3 的安装目录，并在该目录下新建 Data 文件夹(注意大小写)。如果已经运行了，请先在地址栏输入 %appdata% 然后删除该目录下的 Sublime Text 3 文件夹。完成这一步之后再打开 Sublime Text 3 所有的配置文件都会被生成在 Data 文件夹中了。</p>
+<blockquote>
+<p><a href="http://jingyan.baidu.com/article/6f2f55a15c89cab5b93e6cfb.html" target="_blank" rel="external">引用地址</a></p>
+</blockquote>
+<hr>
+<h1 id="2-注册SublimeText-3"><a href="#2-注册SublimeText-3" class="headerlink" title="2. 注册SublimeText 3"></a>2. 注册SublimeText 3</h1><p>打开「sublime_text.exe」-&gt; help -&gt; License，粘贴即可。<br>这个经过测试，可以使用，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">----- BEGIN LICENSE ----- </div><div class="line">Andrew Weber </div><div class="line">Single User License </div><div class="line">EA7E-855605 </div><div class="line">813A03DD 5E4AD9E6 6C0EEB94 BC99798F </div><div class="line">942194A6 02396E98 E62C9979 4BB979FE </div><div class="line">91424C9D A45400BF F6747D88 2FB88078 </div><div class="line">90F5CC94 1CDC92DC 8457107A F151657B </div><div class="line">1D22E383 A997F016 42397640 33F41CFC </div><div class="line">E1D0AE85 A0BBD039 0E9C8D55 E1B89D5D </div><div class="line">5CDB7036 E56DE1C0 EFCC0840 650CD3A6 </div><div class="line">B98FC99C 8FAC73EE D2B95564 DF450523 </div><div class="line">------ END LICENSE ------</div></pre></td></tr></table></figure></p>
+<p><strong>注意: </strong> —– BEGIN LICENSE —– 和—— END LICENSE —— 都要复制粘贴进去。</p>
+<p><a href="http://www.cnblogs.com/akwwl/p/3566445.html" target="_blank" rel="external">引用地址</a></p>
+<hr>
+<h1 id="3-Sublime-Text-3-汉化"><a href="#3-Sublime-Text-3-汉化" class="headerlink" title="3. Sublime Text 3 汉化"></a>3. Sublime Text 3 汉化</h1><p>点击 Preferences -&gt; Package Control , 然后点击 Package Control : Install Package , (第一次运行可以要几秒钟，因为要下载 Package Control 里面存在的包”花名册”），然后在弹出的命令界面，输入 Chinese , 选择 ChineseLocalization (回车或者鼠标单击)。</p>
+<p>切换语言，帮助(H) -&gt; Language -&gt; 简体中文，繁体中文，日本语，English。</p>
+<p><a href="http://jingyan.baidu.com/article/ae97a646c814ccbbfd461d24.html" target="_blank" rel="external">引用地址</a></p>
+<hr>
+<h1 id="4-最新推荐"><a href="#4-最新推荐" class="headerlink" title="4. 最新推荐"></a>4. 最新推荐</h1><p>现在推荐流风轻音制作的 Sublime Text 3 Build 3103 优化版</p>
+<ol>
+<li><a href="http://haojian138.blog.163.com/blog/static/212643110201393010438357/" target="_blank" rel="external">Sublime Text 3 Build 3103 优化版</a></li>
+<li><a href="http://haojian138.blog.163.com/" target="_blank" rel="external">流风清音的博客</a></li>
 </ol>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;通过生成唯一的识别码，识别独立的安卓手机的几种方法&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;strong&gt;本文转载自&lt;/strong&gt;：&lt;a href=&quot;http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/&quot;&gt;难题：识别独立安卓设备 - 「A WING BY WIND」&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
+      &lt;p&gt;以下链接是一篇很好的 Sublime Text 中文教程+配置教程&lt;/p&gt;
     
     </summary>
     
       <category term="其他" scheme="http://bitky.cc/categories/%E5%85%B6%E4%BB%96/"/>
     
     
-      <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
-    
-      <category term="Android" scheme="http://bitky.cc/tags/Android/"/>
+      <category term="sublime text" scheme="http://bitky.cc/tags/sublime-text/"/>
     
   </entry>
   
@@ -1398,48 +1388,58 @@ plugins/accessible/qtaccessiblewidgets.dll
   </entry>
   
   <entry>
-    <title>Sublime Text 3 基本配置教程</title>
-    <link href="http://bitky.cc/2016/04/15/sublime/"/>
-    <id>http://bitky.cc/2016/04/15/sublime/</id>
+    <title>「转」识别独立安卓设备</title>
+    <link href="http://bitky.cc/2016/04/15/device/"/>
+    <id>http://bitky.cc/2016/04/15/device/</id>
     <published>2016-04-15T04:57:47.000Z</published>
-    <updated>2017-04-09T06:34:13.207Z</updated>
+    <updated>2017-04-11T04:34:36.070Z</updated>
     
-    <content type="html"><![CDATA[<p>以下链接是一篇很好的 Sublime Text 中文教程+配置教程</p>
+    <content type="html"><![CDATA[<p>通过生成唯一的识别码，识别独立的安卓手机的几种方法</p>
+<blockquote>
+<p><strong>本文转载自</strong>：<a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/" target="_blank" rel="external">难题：识别独立安卓设备 - 「A WING BY WIND」</a></p>
+</blockquote>
 <a id="more"></a>
-<blockquote>
-<p><a href="http://lucida.me/blog/sublime-text-complete-guide/" target="_blank" rel="external">http://lucida.me/blog/sublime-text-complete-guide/</a></p>
-</blockquote>
-<h1 id="1-修改-Sublime-Text-的默认配置文件位置"><a href="#1-修改-Sublime-Text-的默认配置文件位置" class="headerlink" title="1. 修改 Sublime Text 的默认配置文件位置"></a>1. 修改 Sublime Text 的默认配置文件位置</h1><p>默认情况下安装完 Sublime Text 3 , 在第一次运行的时候 , Sublime Text 3 会在 %appdata% 目录下生成一个 Sublime Text 3 的文件夹，用于存放配置文件，以及后面安装的各种插件；为便于设置完后打包，建议将配置文件位置改到安装目录下。</p>
-<p>安装完 Sublime Text 3 后，不要直接运行找到 Sublime Text 3 的安装目录，并在该目录下新建 Data 文件夹(注意大小写)。如果已经运行了，请先在地址栏输入 %appdata% 然后删除该目录下的 Sublime Text 3 文件夹。完成这一步之后再打开 Sublime Text 3 所有的配置文件都会被生成在 Data 文件夹中了。</p>
-<blockquote>
-<p><a href="http://jingyan.baidu.com/article/6f2f55a15c89cab5b93e6cfb.html" target="_blank" rel="external">引用地址</a></p>
-</blockquote>
-<hr>
-<h1 id="2-注册SublimeText-3"><a href="#2-注册SublimeText-3" class="headerlink" title="2. 注册SublimeText 3"></a>2. 注册SublimeText 3</h1><p>打开「sublime_text.exe」-&gt; help -&gt; License，粘贴即可。<br>这个经过测试，可以使用，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">----- BEGIN LICENSE ----- </div><div class="line">Andrew Weber </div><div class="line">Single User License </div><div class="line">EA7E-855605 </div><div class="line">813A03DD 5E4AD9E6 6C0EEB94 BC99798F </div><div class="line">942194A6 02396E98 E62C9979 4BB979FE </div><div class="line">91424C9D A45400BF F6747D88 2FB88078 </div><div class="line">90F5CC94 1CDC92DC 8457107A F151657B </div><div class="line">1D22E383 A997F016 42397640 33F41CFC </div><div class="line">E1D0AE85 A0BBD039 0E9C8D55 E1B89D5D </div><div class="line">5CDB7036 E56DE1C0 EFCC0840 650CD3A6 </div><div class="line">B98FC99C 8FAC73EE D2B95564 DF450523 </div><div class="line">------ END LICENSE ------</div></pre></td></tr></table></figure></p>
-<p><strong>注意: </strong> —– BEGIN LICENSE —– 和—— END LICENSE —— 都要复制粘贴进去。</p>
-<p><a href="http://www.cnblogs.com/akwwl/p/3566445.html" target="_blank" rel="external">引用地址</a></p>
-<hr>
-<h1 id="3-Sublime-Text-3-汉化"><a href="#3-Sublime-Text-3-汉化" class="headerlink" title="3. Sublime Text 3 汉化"></a>3. Sublime Text 3 汉化</h1><p>点击 Preferences -&gt; Package Control , 然后点击 Package Control : Install Package , (第一次运行可以要几秒钟，因为要下载 Package Control 里面存在的包”花名册”），然后在弹出的命令界面，输入 Chinese , 选择 ChineseLocalization (回车或者鼠标单击)。</p>
-<p>切换语言，帮助(H) -&gt; Language -&gt; 简体中文，繁体中文，日本语，English。</p>
-<p><a href="http://jingyan.baidu.com/article/ae97a646c814ccbbfd461d24.html" target="_blank" rel="external">引用地址</a></p>
-<hr>
-<h1 id="4-最新推荐"><a href="#4-最新推荐" class="headerlink" title="4. 最新推荐"></a>4. 最新推荐</h1><p>现在推荐流风轻音制作的 Sublime Text 3 Build 3103 优化版</p>
-<ol>
-<li><a href="http://haojian138.blog.163.com/blog/static/212643110201393010438357/" target="_blank" rel="external">Sublime Text 3 Build 3103 优化版</a></li>
-<li><a href="http://haojian138.blog.163.com/" target="_blank" rel="external">流风清音的博客</a></li>
+<p>今天碰巧朋友问到我怎么识别独立的安卓手机，就花了一些时间琢磨了一下。其实这个问题可以秒答，就是 IMEI 。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">TelephonyManager.getDeviceId();</div></pre></td></tr></table></figure>
+<p>这需要一个权限：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.READ_PHONE_STATE"</span> /&gt;</span></div></pre></td></tr></table></figure>
+<p>问题如果这么简单就好了，问题在于：</p>
+<ul>
+<li>平板等其他设备，无 SIM 卡，因此无 Telephony 模块。</li>
+<li>有些设备恢复出厂设置的操作会清空 IMEI「水货硬解通常会导致这个结果」</li>
+<li>我国许多山寨手机厂商偷懒，刷机不改 IMEI，所以 IMEI 都是一样的</li>
+</ul>
+<p>因此其实问题从这里才开始。网上能够搜索到的解决方案有以下几点：</p>
+<h1 id="1-WIFI-MAC"><a href="#1-WIFI-MAC" class="headerlink" title="1. WIFI MAC"></a>1. WIFI MAC</h1><p>一个方案是优先采用 IMEI，当 IMEI 相同时，再比较 WIFI 的 MAC 地址。但如果手机没有 WIFI 功能或者 WIFI 功能没有开启「飞行模式」，则无法获取到 MAC 地址。更加让人惆怅的是，我国大山寨厂商实在是懒透了，无线网卡的 MAC 地址居然也不修改，不少自刷机的也是这病情「例如这个，这个还有这个」。至于说蓝牙 MAC 地址就更别说了。IMEI 重复的病因，与 MAC 地址相同的其实是一个原因，都是刷机或山寨，所以这「WIFI MAC」地址的方案其实算不上互补了，必须另谋途径。</p>
+<h1 id="2-Serial-NO"><a href="#2-Serial-NO" class="headerlink" title="2. Serial NO"></a>2. Serial NO</h1><p>另一个方案是用 serial NO 。这个值仅在 Android 2.3 版本以上才提供支持。通过 adb 可以这样查看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell getprop ro.serialno</div></pre></td></tr></table></figure>
+<p>代码中可使用系统变量 <code>android.os.Build.SERIAL</code> 访问。如果这个值能够取到这是仅次于 IMEI 的最好方法了。缺点是这个值在 2.2 及以下版本的 Android 系统不支持。不过好在如今的安卓世界 2.2 及以下的占有率已经越来越低了，翻新速度很快，因此这个值很值得一试。</p>
+<h1 id="3-Android-ID"><a href="#3-Android-ID" class="headerlink" title="3. Android ID"></a>3. Android ID</h1><p>其实安卓系统提供了 <code>Settings.Secure.ANDROID_ID</code> 来获取唯一设备号。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> android.provider.Settings.Secure;</div><div class="line"></div><div class="line"><span class="keyword">private</span> String android_id = Secure.getString(</div><div class="line">                            getContext().getContentResolver(),</div><div class="line">                            Secure.ANDROID_ID);</div></pre></td></tr></table></figure>
+<p>但同样 2.2 以前的系统支持得不好。这个值是系统初次启动后生成的，因此恢复出厂设置后这个值会变，导致观测到的设备数虚高。在手机刷机、重置频繁的环境，这个值是不靠谱的。另外某大厂生产的设备居然有个 BUG，这个值是会重复的「DROID2」，因此这个值还是别用为好。</p>
+<h1 id="4-Generated-UUID"><a href="#4-Generated-UUID" class="headerlink" title="4. Generated UUID"></a>4. Generated UUID</h1><p>最后还有一个自己生成 UUID 的办法，保存这个 ID，每次访问服务器时上传，自己告诉系统自己是谁。这个方法比所有硬件方法都更不靠谱，因为只需卸载软件和清理数据就会导致这个值被删除，从而产生新的 UUID，造成观测到的设备数量虚高。更别说刷机和恢复出厂设置了。这个方法非常适合用来统计软件安装次数，而非独立设备数。</p>
+<h1 id="5-结论"><a href="#5-结论" class="headerlink" title="5. 结论"></a>5. 结论</h1><p>综上所述，目前为止我还没找到非常完美的统计独立设备的方案，尤其是在中国这个水货、硬解、山寨、刷机市场泛滥和不规范的安卓世界，更是难上加难。</p>
+<p>但是反过来想，是不是一台完全刷新，安装了全新的 ROM 的手机，就已经不是原来的那台手机了呢？统计独立设备数的目的究竟是什么？如果要的是独立活跃设备数，其实用自己生成的 UUID 已经足够，因为原来使用的那个 UUID 已经失去活性，可以忽略了。对于 APP 开发者而言这个情况与用户换了一台手机，完全弃用旧手机的情况其实是一样的。假如是采取活跃 UUID 的方式，则即使是使用 ANDROID_ID 或者自己生成的 UUID 都是可取的做法了。</p>
+<h1 id="6-文章来源："><a href="#6-文章来源：" class="headerlink" title="6. 文章来源："></a>6. 文章来源：</h1><ol>
+<li><a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/" target="_blank" rel="external">难题：识别独立安卓设备</a></li>
 </ol>
 ]]></content>
     
     <summary type="html">
     
-      &lt;p&gt;以下链接是一篇很好的 Sublime Text 中文教程+配置教程&lt;/p&gt;
+      &lt;p&gt;通过生成唯一的识别码，识别独立的安卓手机的几种方法&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;本文转载自&lt;/strong&gt;：&lt;a href=&quot;http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/&quot;&gt;难题：识别独立安卓设备 - 「A WING BY WIND」&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
     
     </summary>
     
       <category term="其他" scheme="http://bitky.cc/categories/%E5%85%B6%E4%BB%96/"/>
     
     
-      <category term="sublime text" scheme="http://bitky.cc/tags/sublime-text/"/>
+      <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
+    
+      <category term="Android" scheme="http://bitky.cc/tags/Android/"/>
     
   </entry>
   
