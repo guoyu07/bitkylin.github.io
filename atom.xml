@@ -824,9 +824,9 @@ gradle dependencies
       <category term="C#" scheme="http://bitky.cc/categories/C/"/>
     
     
-      <category term="CSharp" scheme="http://bitky.cc/tags/CSharp/"/>
-    
       <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
+    
+      <category term="CSharp" scheme="http://bitky.cc/tags/CSharp/"/>
     
       <category term="SQLite" scheme="http://bitky.cc/tags/SQLite/"/>
     
@@ -864,9 +864,9 @@ gradle dependencies
     
       <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
     
-      <category term="CSharp" scheme="http://bitky.cc/tags/CSharp/"/>
-    
       <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
+    
+      <category term="CSharp" scheme="http://bitky.cc/tags/CSharp/"/>
     
       <category term="计划任务" scheme="http://bitky.cc/tags/%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1/"/>
     
