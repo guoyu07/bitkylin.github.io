@@ -1,0 +1,852 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Netty,TCP," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文采用 Netty 这一最流行的 Java NIO 框架，作为 Java 服务器通信部分的基础框架，探索使用一个通道、一台服务器对多个客户端提供服务。 完成客户端 - 服务器通信，需要基于 TCP 协议之上，自定义一套简单的通信协议，其中数据交换方式需要使用自定义帧。为实现以上方案，本文采用 Netty 框架实现 Java 服务器的通信部分。">
+<meta name="keywords" content="Java,Netty,TCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于 Netty 的自定义帧高可靠性读取方案">
+<meta property="og:url" content="http://bitky.cc/2017/03/26/netty/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="本文采用 Netty 这一最流行的 Java NIO 框架，作为 Java 服务器通信部分的基础框架，探索使用一个通道、一台服务器对多个客户端提供服务。 完成客户端 - 服务器通信，需要基于 TCP 协议之上，自定义一套简单的通信协议，其中数据交换方式需要使用自定义帧。为实现以上方案，本文采用 Netty 框架实现 Java 服务器的通信部分。">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-e9dce2216d4609a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-1e3784eb89e41957.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-05-05T09:05:14.509Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于 Netty 的自定义帧高可靠性读取方案">
+<meta name="twitter:description" content="本文采用 Netty 这一最流行的 Java NIO 框架，作为 Java 服务器通信部分的基础框架，探索使用一个通道、一台服务器对多个客户端提供服务。 完成客户端 - 服务器通信，需要基于 TCP 协议之上，自定义一套简单的通信协议，其中数据交换方式需要使用自定义帧。为实现以上方案，本文采用 Netty 框架实现 Java 服务器的通信部分。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-e9dce2216d4609a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2017/03/26/netty/"/>
+
+
+
+
+
+  <title> 基于 Netty 的自定义帧高可靠性读取方案 | 比特麒麟 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?d990164c500ef11b3679defe3c7305a8";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2017/03/26/netty/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                基于 Netty 的自定义帧高可靠性读取方案
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-26T12:57:47+08:00">
+                2017-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/26/netty/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文采用 Netty 这一最流行的 Java NIO 框架，作为 Java 服务器通信部分的基础框架，探索使用一个通道、一台服务器对多个客户端提供服务。</p>
+<p>完成客户端 - 服务器通信，需要基于 TCP 协议之上，自定义一套简单的通信协议，其中数据交换方式需要使用自定义帧。为实现以上方案，本文采用 Netty 框架实现 Java 服务器的通信部分。</p>
+<a id="more"></a>
+<blockquote>
+<p><strong>Netty</strong> 是由 JBoss 提供的一个 Java开源 框架。Netty 提供异步的、事件驱动的网络应用程序框架和工具，用以快速开发高性能、高可靠性的网络服务器和客户端程序。</p>
+<p>也就是说，Netty 是一个基于 NIO 的客户、服务器端编程框架，使用Netty 可以确保你快速和简单的开发出一个网络应用，例如实现了某种协议的客户，服务端应用。Netty 相当简化和流线化了网络应用的编程开发过程，例如，TCP 和 UDP 的 socket 服务开发。</p>
+</blockquote>
+<p>本项目的硬件设备集群使用 CAN 总线作为通信协议，硬件设备产生的数据和工作人员的控制指令均由服务器后端应用程序处理并存储。由于服务器并未原生支持 CAN 总线，故为了方便起见，使用「CAN转以太网」模块作为 CAN 协议和 TCP 协议交换的中介，以谋求实现的简单化。项目总体架构图如下图所示：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-e9dce2216d4609a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="项目总体架构图"></p>
+<blockquote>
+<p>CAN - bus，即控制器局域网，是国际上应用最广泛的现场总线之一。</p>
+<p>作为一种技术先进、可靠性高、功能完善、成本合理的远程网络通信控制方式，CAN - bus 已经被广泛应用到各个自动化控制系统中。从高速的网络到低价位的多路接线都可以使用 CAN - bus。例如，在汽车电子、自动控制、智能大厦、电路系统、安防监控等领域。</p>
+</blockquote>
+<h1 id="1-Netty-框架的学习"><a href="#1-Netty-框架的学习" class="headerlink" title="1. Netty 框架的学习"></a>1. Netty 框架的学习</h1><p>以下提供几篇不错的文章，帮助大家学习 Netty 这一颇受瞩目的框架。</p>
+<ol>
+<li><a href="http://ifeve.com/netty-in-action/" target="_blank" rel="external">《Netty in Action》中文版 - 并发编程网</a></li>
+<li><a href="https://waylau.com/essential-netty-in-action/" target="_blank" rel="external">Essential Netty in Action -《Netty 实战(精髓)》</a></li>
+<li><a href="https://waylau.gitbooks.io/netty-4-user-guide/" target="_blank" rel="external">Netty 4.x User Guide 中文翻译《Netty 4.x 用户指南》</a></li>
+</ol>
+<h1 id="2-Bootstrapping-服务器方案"><a href="#2-Bootstrapping-服务器方案" class="headerlink" title="2. Bootstrapping 服务器方案"></a>2. Bootstrapping 服务器方案</h1><p>以下代码是 Bootstrapping 服务器的实现方案：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KyServer</span></span>&#123;</div><div class="line">  <span class="keyword">private</span> SuccessfulListener launchListener;</div><div class="line">  <span class="keyword">private</span> SuccessfulListener finishListener;</div><div class="line">  <span class="keyword">private</span> NioEventLoopGroup group;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">new</span> Thread(() -&gt; &#123;</div><div class="line">      group = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">      ServerBootstrap bootstrap = <span class="keyword">new</span> ServerBootstrap();</div><div class="line">      bootstrap.group(group)</div><div class="line">          .channel(NioServerSocketChannel.class)</div><div class="line">          .childHandler(<span class="keyword">new</span> ServerChannelInitializerTest());</div><div class="line">      ChannelFuture channelFuture = bootstrap.bind(<span class="keyword">new</span> InetSocketAddress(<span class="number">30232</span>));</div><div class="line">      channelFuture.addListener(</div><div class="line">          (ChannelFutureListener) future -&gt; startListenerHandle(future, launchListener));</div><div class="line">    &#125;).start();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startListenerHandle</span><span class="params">(Future future, SuccessfulListener listener)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!future.isSuccess()) future.cause().printStackTrace();</div><div class="line">    <span class="keyword">if</span> (listener != <span class="keyword">null</span>) listener.onSuccess(future.isSuccess());</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setLaunchSuccessfulListener</span><span class="params">(</span></span></div><div class="line">      SuccessfulListener successfulListener) &#123;</div><div class="line">    <span class="keyword">this</span>.launchListener = successfulListener;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFinishSuccessfulListener</span><span class="params">(</span></span></div><div class="line">      SuccessfulListener finishListener) &#123;</div><div class="line">    <span class="keyword">this</span>.finishListener = finishListener;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shutdown</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (group != <span class="keyword">null</span>) &#123;</div><div class="line">      Future&lt;?&gt; futureShutdown = group.shutdownGracefully();</div><div class="line">      futureShutdown.addListener(future -&gt; startListenerHandle(future, finishListener));</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="2-1-Bootstrapping-服务器的设计要点"><a href="#2-1-Bootstrapping-服务器的设计要点" class="headerlink" title="2.1 Bootstrapping 服务器的设计要点"></a>2.1 Bootstrapping 服务器的设计要点</h2><ul>
+<li>创建一个 ServerBootstrap 实例来启动和绑定服务器</li>
+<li>创建并且分配一个 NioEventLoopgroup 实例来处理 event，比如接受新的连接和读/写数据</li>
+<li>指定本地 InetSocketAddress 到服务器绑定的端口</li>
+<li>用 ChannelHandler 实例来初始化 Channel</li>
+<li>调用 ServerBootstrap.bind() 来绑定服务器</li>
+</ul>
+<h2 id="2-2-服务器监听器的设计「观察者模式」"><a href="#2-2-服务器监听器的设计「观察者模式」" class="headerlink" title="2.2 服务器监听器的设计「观察者模式」"></a>2.2 服务器监听器的设计「观察者模式」</h2><p>首先在该类中设置成员变量：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">private SuccessfulListener launchListener;</div><div class="line">private SuccessfulListener finishListener;</div></pre></td></tr></table></figure></p>
+<p>而后添加该变量的 <code>set</code> 方法，以及监听器的处理方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">private void startListenerHandle(Future future, SuccessfulListener listener) &#123;</div><div class="line">    if (!future.isSuccess()) future.cause().printStackTrace();</div><div class="line">    if (listener != null) listener.onSuccess(future.isSuccess());</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void setLaunchSuccessfulListener(SuccessfulListener successfulListener) &#123;</div><div class="line">    this.launchListener = successfulListener;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void setFinishSuccessfulListener(SuccessfulListener finishListener) &#123;</div><div class="line">    this.finishListener = finishListener;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在服务器启动监听时，执行如下代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(30232));</div><div class="line">channelFuture.addListener(future -&gt; startListenerHandle(future, launchListener));</div></pre></td></tr></table></figure></p>
+<p>在外部关闭服务器时，执行该方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public void shutdown() &#123;</div><div class="line">    if (group != null) &#123;</div><div class="line">        Future&lt;?&gt; futureShutdown = group.shutdownGracefully();</div><div class="line">        futureShutdown.addListener(future -&gt; startListenerHandle(future, finishListener));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>通过如上方法，外部操作者可以方便得知服务器是否启动成功以及是否结束成功，使用观察者模式，完美实现了对服务器启动及关闭的监听。</p>
+<h1 id="3-服务器业务逻辑的实现"><a href="#3-服务器业务逻辑的实现" class="headerlink" title="3. 服务器业务逻辑的实现"></a>3. 服务器业务逻辑的实现</h1><p>首先使用初始化方法 <code>ServerChannelInitializer</code> 完成所有 <code>ChannelHandler</code> 对 <code>Channel</code> 的绑定操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerChannelInitializer</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">NioSocketChannel</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(NioSocketChannel ch)</span> </span>&#123;</div><div class="line">        ch.pipeline().addLast(<span class="keyword">new</span> LoggingHandler(<span class="string">"NO1"</span>));</div><div class="line">        <span class="keyword">byte</span> head = <span class="number">0x11</span>;</div><div class="line">        ch.pipeline().addLast(<span class="keyword">new</span> FrameIdentifierChannelInboundHandler(head));</div><div class="line">        ch.pipeline().addLast(<span class="keyword">new</span> ShowByteBufAsFrameInBoundHandler());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="3-1-输入数据处理方案"><a href="#3-1-输入数据处理方案" class="headerlink" title="3.1 输入数据处理方案"></a>3.1 输入数据处理方案</h2><h3 id="3-1-1-自定义帧方案"><a href="#3-1-1-自定义帧方案" class="headerlink" title="3.1.1 自定义帧方案"></a>3.1.1 自定义帧方案</h3><p>自定义帧包括「帧标识位」、「数据长度」、「数据体」，如下图所示，：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-1e3784eb89e41957.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="自定义帧示意图"></p>
+<ul>
+<li>帧标识位：0x11。</li>
+<li>数据长度：两个字节，可表示数据部分大小最大为 2 ^ 16 - 1 。</li>
+<li>数据体：实际有用的数据。</li>
+</ul>
+<h3 id="3-1-2-输入数据处理器"><a href="#3-1-2-输入数据处理器" class="headerlink" title="3.1.2 输入数据处理器"></a>3.1.2 输入数据处理器</h3><p>以下为输入数据的第一个处理器，可以保证无论 TCP 帧经历怎样的粘包、拆包，均可以准确提取每一个自定义帧的数据部分。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 入端自定义帧提取处理器</div><div class="line"> * 将数据流提取出完整的自定义帧并传入下一个处理器</div><div class="line"> */</div><div class="line">public class FrameIdentifierChannelInboundHandler extends SimpleChannelInboundHandler&lt;ByteBuf&gt; &#123;</div><div class="line">  private byte[] frameHead;</div><div class="line">  private int frameHeadLength;</div><div class="line">  private int frameBodyLength;</div><div class="line">  private FrameReceivedEnum frameStatus = FrameReceivedEnum.READY;</div><div class="line">  private ByteBuf holdByteBuf = Unpooled.buffer(1024);</div><div class="line"></div><div class="line">  FrameIdentifierChannelInboundHandler(byte... frameHead) &#123;</div><div class="line">    this();</div><div class="line">    this.frameHead = frameHead;</div><div class="line">    frameHeadLength = frameHead.length;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  protected void channelRead0 (ChannelHandlerContext ctx, ByteBuf msg) &#123;</div><div class="line">    //数据读入本地buffer</div><div class="line">    holdByteBuf.writeBytes(msg);</div><div class="line">    while (true) &#123;</div><div class="line">      //若读取状态为: 开始读取</div><div class="line">      if (frameStatus == FrameReceivedEnum.READY) &#123;</div><div class="line">        if (!matchFrameHead(holdByteBuf)) &#123;</div><div class="line">          holdByteBuf.clear();</div><div class="line">          break;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      //若读取状态为: 帧长读取</div><div class="line">      //数据体完全包含在 buffer 内，则可通过此状态</div><div class="line">      if (frameStatus == FrameReceivedEnum.READING_LENGTH) &#123;</div><div class="line">        if (holdByteBuf.readableBytes() &lt;= 1) break;</div><div class="line">        //无符号 short 需要用 int 型引用</div><div class="line">        int currentFrameLength = holdByteBuf.getUnsignedShort(holdByteBuf.readerIndex());</div><div class="line"></div><div class="line">        //可读byte数为长度计数(2)+数据体长度; 所以当前帧长+2 &lt;= 可读帧长</div><div class="line">        if (currentFrameLength + 2 &lt;= holdByteBuf.readableBytes()) &#123;</div><div class="line">          frameBodyLength = holdByteBuf.readUnsignedShort();</div><div class="line">          frameStatus = FrameReceivedEnum.READING_BODY;</div><div class="line">        &#125; else &#123;</div><div class="line">          break;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      //若读取状态为: 数据体读取</div><div class="line">      //预设数据体完全包含在buffer内，否则抛出异常</div><div class="line">      if (frameStatus == FrameReceivedEnum.READING_BODY) &#123;</div><div class="line">        if (frameBodyLength == 0) &#123;</div><div class="line">          frameStatus = FrameReceivedEnum.READY;</div><div class="line">          frameBodyLength = -1;</div><div class="line">          holdByteBuf.discardReadBytes();</div><div class="line">        &#125; else if (frameBodyLength &gt; 0) &#123;</div><div class="line">          ByteBuf returnBuf = Unpooled.buffer(frameBodyLength);</div><div class="line">          holdByteBuf.readBytes(returnBuf);</div><div class="line">          frameStatus = FrameReceivedEnum.READY;</div><div class="line">          //    ctx.fireChannelRead(returnBuf);</div><div class="line">          ctx.writeAndFlush(returnBuf);</div><div class="line">          frameBodyLength = -1;</div><div class="line">          holdByteBuf.discardReadBytes();</div><div class="line">        &#125; else &#123;</div><div class="line">          throw new FrameLoadException(&quot;自定义帧长度计数异常&quot;);</div><div class="line">        &#125;</div><div class="line">      &#125; else &#123;</div><div class="line">        throw new FrameLoadException(&quot;自定义帧读取异常&quot;);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  private boolean matchFrameHead(ByteBuf byteBuf) &#123;</div><div class="line">    while (true) &#123;</div><div class="line">      if (byteBuf.readableBytes() &lt; frameHeadLength) &#123;</div><div class="line">        return false;</div><div class="line">      &#125;</div><div class="line">      if (frameHead[0] == byteBuf.readByte()) &#123;</div><div class="line">        frameStatus = FrameReceivedEnum.READING_LENGTH;</div><div class="line">        return true;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以下为第二个输入数据处理器，可将前一处理器的结果「优雅」打印到控制台上并原样发送至客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public class ShowByteBufAsFrameInBoundHandler extends SimpleChannelInboundHandler&lt;ByteBuf&gt; &#123;</div><div class="line">  </div><div class="line">    @Override</div><div class="line">    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) &#123;</div><div class="line">        System.out.println(ByteBufUtil.prettyHexDump(byteBuf));</div><div class="line">        ctx.pipeline().writeAndFlush(Unpooled.copiedBuffer(msg));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="4-参考链接"><a href="#4-参考链接" class="headerlink" title="4. 参考链接"></a>4. 参考链接</h1><ol>
+<li><a href="http://www.gzenpu.com/CANToTcp.html" target="_blank" rel="external">CAN 转以太网设备介绍</a></li>
+<li><a href="http://baike.baidu.com/item/netty" target="_blank" rel="external">Netty - 百度百科</a></li>
+<li><a href="http://ifeve.com/netty-in-action/" target="_blank" rel="external">《Netty in Action》中文版 - 并发编程网</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Netty/" rel="tag"># Netty</a>
+          
+            <a href="/tags/TCP/" rel="tag"># TCP</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/26/website/" rel="next" title="为你的简书和 GitHub 设定个性域名">
+                <i class="fa fa-chevron-left"></i> 为你的简书和 GitHub 设定个性域名
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/23/maven/" rel="prev" title="使用 Maven 构建 Java 项目">
+                使用 Maven 构建 Java 项目 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">43</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/u/bd2e386a6ea8" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-book"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-truck"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="/about" target="_blank" title="个人资料">
+                  
+                    <i class="fa fa-fw fa-user-circle-o"></i>
+                  
+                  个人资料
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Netty-框架的学习"><span class="nav-number">1.</span> <span class="nav-text">1. Netty 框架的学习</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Bootstrapping-服务器方案"><span class="nav-number">2.</span> <span class="nav-text">2. Bootstrapping 服务器方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Bootstrapping-服务器的设计要点"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Bootstrapping 服务器的设计要点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-服务器监听器的设计「观察者模式」"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 服务器监听器的设计「观察者模式」</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-服务器业务逻辑的实现"><span class="nav-number">3.</span> <span class="nav-text">3. 服务器业务逻辑的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-输入数据处理方案"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 输入数据处理方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-自定义帧方案"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 自定义帧方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-输入数据处理器"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 输入数据处理器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-参考链接"><span class="nav-number">4.</span> <span class="nav-text">4. 参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "5178499c967d4c549637abc4a929a2d6",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

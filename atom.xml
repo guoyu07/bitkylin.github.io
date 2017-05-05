@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bitky.cc/"/>
-  <updated>2017-04-22T11:31:29.906Z</updated>
+  <updated>2017-05-05T09:06:53.844Z</updated>
   <id>http://bitky.cc/</id>
   
   <author>
@@ -14,6 +14,191 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Netty 框架总结「ChannelHandler 及 EventLoop」</title>
+    <link href="http://bitky.cc/2017/05/05/netty/"/>
+    <id>http://bitky.cc/2017/05/05/netty/</id>
+    <published>2017-05-05T04:57:47.000Z</published>
+    <updated>2017-05-05T09:06:53.844Z</updated>
+    
+    <content type="html"><![CDATA[<p>学习了一段时间的 Netty，将重点与学习心得总结如下，本文主要总结ChannelHandler 及 EventLoop 的知识点和基本用法，本文章节排序参照《Netty in Action》的章节排序。</p>
+<a id="more"></a>
+<blockquote>
+<p>以下内容主要参考「并发编程网」的 <a href="http://ifeve.com/netty-in-action/" target="_blank" rel="external">《Netty in Action》中文版</a> 以及《Netty in Action》原版图书，辅助参考 <a href="https://waylau.com/essential-netty-in-action/" target="_blank" rel="external">Essential Netty in Action 《Netty 实战(精髓)》</a> 以及 Netty 官网的 <a href="http://netty.io/4.1/api/index.html" target="_blank" rel="external">Netty 4.1 JavaDoc</a> 。</p>
+</blockquote>
+<h1 id="6-ChannelHandler-和-ChannelPipeline"><a href="#6-ChannelHandler-和-ChannelPipeline" class="headerlink" title="6. ChannelHandler 和 ChannelPipeline"></a>6. ChannelHandler 和 ChannelPipeline</h1><p>一个 Channel 正常的生命周期如下图所示。随着状态发生变化，相应的 event 产生。这些 event 被转发到 ChannelPipeline 中的 ChannelHandler 来采取相应的操作。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-32f2f760f448b713.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Channel状态模型"></p>
+<h2 id="6-1-ChannelHandler"><a href="#6-1-ChannelHandler" class="headerlink" title="6.1 ChannelHandler"></a>6.1 ChannelHandler</h2><p>ChannelHandler 有两个重要的子接口：</p>
+<ul>
+<li>「ChannelInboundHandler」处理输入数据和所有类型的状态变化</li>
+<li>「ChannelOutboundHandler」处理输出数据，可以拦截所有操作</li>
+</ul>
+<h3 id="6-1-1-ChannelInboundHandler"><a href="#6-1-1-ChannelInboundHandler" class="headerlink" title="6.1.1  ChannelInboundHandler"></a>6.1.1  ChannelInboundHandler</h3><p>下表列出接口 ChannelInboundHandler 的方法。当收到数据或相关 Channel 的状态改变时，这些方法被调用，<strong>这些方法和Channel的生命周期密切相关</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>channelRegistered</td>
+<td>当一个Channel注册到EventLoop上，可以处理I/O时被调用</td>
+</tr>
+<tr>
+<td>channelUnregistered</td>
+<td>当一个Channel从它的EventLoop上解除注册，不再处理I/O时被调用</td>
+</tr>
+<tr>
+<td>channelActive</td>
+<td>当Channel变成活跃状态时被调用；Channel是连接/绑定、就绪的</td>
+</tr>
+<tr>
+<td>channelInactive</td>
+<td>当Channel离开活跃状态，不再连接到某个远端时被调用</td>
+</tr>
+<tr>
+<td><strong>channelReadComplete</strong></td>
+<td>当Channel上的某个读操作完成时被调用</td>
+</tr>
+<tr>
+<td><strong>channelRead</strong></td>
+<td>当从Channel中读数据时被调用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="6-1-2-ChannelOutboundHandler"><a href="#6-1-2-ChannelOutboundHandler" class="headerlink" title="6.1.2 ChannelOutboundHandler"></a>6.1.2 ChannelOutboundHandler</h3><p>输出的操作和数据由 ChannelOutBoundHandler 处理。它的方法可以被 Channel，ChannelPipeline 和 ChannelHandlerContext 调用，子接口 ChannelOutboundHandler 的主要方法如下：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bind(ChannelHandlerContext,SocketAddress,ChannelPromise)</td>
+<td>请求绑定 Channel 到一个本地地址</td>
+</tr>
+<tr>
+<td>connect(ChannelHandlerContext, SocketAddress,SocketAddress,ChannelPromise)</td>
+<td>请求连接 Channel 到远端</td>
+</tr>
+<tr>
+<td>disconnect(ChannelHandlerContext, ChannelPromise)</td>
+<td>请求从远端断开 Channel</td>
+</tr>
+<tr>
+<td>close(ChannelHandlerContext,ChannelPromise)</td>
+<td>请求关闭 Channel</td>
+</tr>
+<tr>
+<td>deregister(ChannelHandlerContext, ChannelPromise)</td>
+<td>请求 Channel 从它的 EventLoop 上解除注册</td>
+</tr>
+<tr>
+<td>read(ChannelHandlerContext)</td>
+<td>请求从 Channel 中读更多的数据</td>
+</tr>
+<tr>
+<td><strong>flush(ChannelHandlerContext)</strong></td>
+<td>请求通过 Channel 刷队列数据到远端</td>
+</tr>
+<tr>
+<td><strong>write(ChannelHandlerContext,Object, ChannelPromise)</strong></td>
+<td>请求通过 Channel 写数据到远端</td>
+</tr>
+</tbody>
+</table>
+<h3 id="6-1-3-ChannelHandler-适配器类"><a href="#6-1-3-ChannelHandler-适配器类" class="headerlink" title="6.1.3 ChannelHandler 适配器类"></a>6.1.3 ChannelHandler 适配器类</h3><p>ChannelInboundHandlerAdapter 和 ChannelOutboundHandlerAdapter 这两个适配器类分别提供了 ChannelInboundHandler 和 ChannelOutboundHandler 的基本实现，它们继承了共同的父接口 ChannelHandler 的方法，扩展了抽象类 ChannelHandlerAdapter。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-2b19efbbd8ae56cb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="ChannelHandlerAdapter类层级关系"></p>
+<ul>
+<li><p>ChannelHandlerAdapter 提供了工具方法 isSharable()。如果类实现带 @Sharable 注解，那么这个方法就会返回 true，意味着这个对象可以被添加到多个 ChannelPipeline 中。</p>
+</li>
+<li><p>ChannelInboundHandlerAdapter 和 ChannelOutboundHandlerAdapter 中的方法调用相关 ChannelHandlerContext 中的等效方法，因此将事件转发到管道中的下一个ChannelHandler。</p>
+</li>
+</ul>
+<h3 id="6-1-4-ChannelFuture-和-ChannelPromise"><a href="#6-1-4-ChannelFuture-和-ChannelPromise" class="headerlink" title="6.1.4 ChannelFuture 和 ChannelPromise"></a>6.1.4 ChannelFuture 和 ChannelPromise</h3><ul>
+<li>ChannelPromise 是 ChannelFuture 的子接口</li>
+<li>而 ChannelFuture 是不可变对象</li>
+<li>ChannelPromise 定义了可写的方法，比如 setSuccess(),  setFailure()</li>
+</ul>
+<h3 id="6-1-5-释放资源"><a href="#6-1-5-释放资源" class="headerlink" title="6.1.5 释放资源"></a>6.1.5 释放资源</h3><p><strong>1. 输入方向「Inbound」</strong><br>当一个 ChannelInboundHandler 实现类重写 channelRead() 方法时，它要负责释放 ByteBuf 相关的内存。可使用 Netty 提供的工具方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ReferenceCountUtil.release(「ByteBuf 的对象」)</div></pre></td></tr></table></figure>
+<p>更简单的，可使用子类 SimpleChannelInboundHandler ，一条消息在被 ChannelRead0() 读取后，会被自动释放资源，此时任何对消息的引用都会变成无效，所以不能保存这些引用待后来使用。</p>
+<p><strong>2. 输出方向「Outbound」</strong><br>在输出方向，如果处理一个 write() 操作并且丢弃一条消息（没有写入 Channel），就应该负责释放这条消息。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">@ChannelHandler.Sharable public </div><div class="line">class DiscardOutboundHandler extends ChannelOutboundHandlerAdapter &#123;</div><div class="line"></div><div class="line">@Override</div><div class="line">public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) &#123;</div><div class="line">    ReferenceCountUtil.release(msg);  //使用 ReferenceCountUtil.release(...) 释放资源</div><div class="line">    promise.setSuccess();  //通知 ChannelPromise 数据已经被处理</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>如果一个消息被“消费”或者丢弃，没有送到 ChannelPipeline 中的下一个 ChannelOutboundHandler，用户就要负责调用 ReferenceCountUtil.release()。如果消息到达了真正的传输层，在它被写到 Socket 中或者 Channel 关闭时，会被自动释放，用户不用管。</p>
+<h2 id="6-2-ChannelPipeline-接口"><a href="#6-2-ChannelPipeline-接口" class="headerlink" title="6.2 ChannelPipeline 接口"></a>6.2 ChannelPipeline 接口</h2><ul>
+<li><p>每个新创建的 Channel 都会分配一个新的 ChannelPipeline，Channel 不可以更换或解除当前的 ChannelPipeline，在 Netty 组件的整个生命周期中这个关系是固定的。</p>
+</li>
+<li><p>一个 ChannelPipeline 可看成是一串 ChannelHandler 实例，拦截穿过 Channel 的输入输出 event。</p>
+</li>
+<li><p>根据来源，一个 event 可以被一个 ChannelInboundHandler 或 ChannelOutboundHandler 处理。接下来，通过调用 ChannelHandlerContext 的方法，event 会被转发到下一个同类型的 handler。</p>
+</li>
+</ul>
+<h3 id="6-2-1-ChannelHandlerContext"><a href="#6-2-1-ChannelHandlerContext" class="headerlink" title="6.2.1 ChannelHandlerContext"></a>6.2.1 ChannelHandlerContext</h3><ul>
+<li><p>通过 ChannelHandlerContext，一个 handler 可以通知 ChannelPipeline 中的下一个ChannelHandler，甚至动态改动下一个ChannelHandler 所属的 ChannelPipeline。</p>
+</li>
+<li><p>ChannelPipeline 主要由一系列 ChannelHandler 组成的。ChannelPipeline 提供在 ChannelPipeline 中传送 event 的方法。</p>
+</li>
+<li><p>ChannelHandlerContext 的一些方法和其他类（Channel 和 ChannelPipeline）的方法名字相似，但是 ChannelHandlerContext 的方法采用了更短的 event 传递路程。我们应该尽可能利用这一点来实现最好的性能。</p>
+</li>
+<li><p>如果你在 Channel 或者 ChannelPipeline 实例上调用这些方法，它们的调用会穿过整个 pipeline。而在 ChannelHandlerContext 上调用的同样的方法，仅仅从当前 ChannelHandler 开始，走到 pipeline 中下一个可以处理这个 event 的 ChannelHandler。</p>
+</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-03d6432455caa91e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="ChannelPipeline 和 ChannelHandlers"></p>
+<p><strong>「本节参考」</strong> <a href="http://ifeve.com/netty-in-action-6/" target="_blank" rel="external">第六章 ChannelHandler 和 ChannelPipeline</a></p>
+<h1 id="7-EventLoop-和-EventLoopGroup"><a href="#7-EventLoop-和-EventLoopGroup" class="headerlink" title="7. EventLoop 和 EventLoopGroup"></a>7. EventLoop 和 EventLoopGroup</h1><h2 id="7-1-Java-基本的线程池模式"><a href="#7-1-Java-基本的线程池模式" class="headerlink" title="7.1 Java 基本的线程池模式"></a>7.1 Java 基本的线程池模式</h2><ul>
+<li>从池中空闲的线程中选出一个，分配一个提交的task「一个Runnable的实现」</li>
+<li>当task完成，线程返回池中，等待复用「下一次task分配」</li>
+</ul>
+<h2 id="7-2-EventLoop「事件循环」"><a href="#7-2-EventLoop「事件循环」" class="headerlink" title="7.2 EventLoop「事件循环」"></a>7.2 EventLoop「事件循环」</h2><ul>
+<li>EventLoop 始终由一个线程驱动</li>
+<li>一个 EventLoop 可以被指派来服务多个 Channel</li>
+<li>一个 Channel 只拥有一个 EventLoop</li>
+</ul>
+<p>task (Runnable或Callable) 可以直接提交到 EventLoop 实现即刻或者延后执行。根据配置和可用的CPU核，可以创建多个 EventLoop 来优化资源利用。</p>
+<p>一个 event 的本质决定了它将如何被处理；它可能从网络协议栈传送数据到你的应用，或者反过来，或者做一些完全不一样的事情。但是 event 处理逻辑必须足够通用和灵活，来对付所有可能的情况。</p>
+<p>所以，在 Netty 4，所有的 I/O 操作和 event 都是由分配给 EventLoop 的那一个 Thread 来处理的。Netty 4 采用的线程模型，在同一个线程的 EventLoop 中处理所有发生的事。</p>
+<h2 id="7-3-EventLoopGroup"><a href="#7-3-EventLoopGroup" class="headerlink" title="7.3 EventLoopGroup"></a>7.3 EventLoopGroup</h2><ul>
+<li>EventLoopGroup 负责分配 EventLoop 到新创建的 Channel</li>
+<li>异步实现只用了很少 EventLoop，这几个 EventLoop 被所有 Channel 共享</li>
+<li>一但 Channel 被指派了一个 EventLoop，在它的整个生命周期过程中，都会用这个 EventLoop</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-9126a72ae84c6011.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="针对非阻塞传输的EventLoop分配"></p>
+<p>为 Channel 的 I/O 和 event 提供服务的 EventLoop 都包含在一个 EventLoopGroup 中。EventLoop 创建和分配的方式根据传输实现的不同而有所不同。</p>
+<p>异步实现只用了很少几个 EventLoop（和它们关联的线程），在目前 Netty 的模型中，这几个 EventLoop 被所有 Channel 共享。这让很多 Channel 被最少数量的线程服务，而不是每个 Channel 分配一个线程。</p>
+<p>EventLoopGroup 负责分配一个 EventLoop 到每个新创建的 Channel。在目前的实现中，采用循环 (round-robin) 策略可以满足一个平衡的分配，同一个 Eventloop 还可能会被分配到多个 Channel。</p>
+<p><strong>「本节参考」</strong> <a href="http://ifeve.com/netty-in-action-7/" target="_blank" rel="external">第七章 EventLoop和线程模型</a></p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><ol>
+<li><a href="http://ifeve.com/netty-in-action/" target="_blank" rel="external">《Netty in Action》中文版</a></li>
+<li><a href="https://waylau.com/essential-netty-in-action/" target="_blank" rel="external">Essential Netty in Action 《Netty 实战(精髓)》</a></li>
+<li><a href="http://netty.io/4.1/api/index.html" target="_blank" rel="external">Netty 4.1 JavaDoc</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;学习了一段时间的 Netty，将重点与学习心得总结如下，本文主要总结ChannelHandler 及 EventLoop 的知识点和基本用法，本文章节排序参照《Netty in Action》的章节排序。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Java" scheme="http://bitky.cc/categories/Java/"/>
+    
+    
+      <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
+    
+      <category term="Netty" scheme="http://bitky.cc/tags/Netty/"/>
+    
+      <category term="TCP" scheme="http://bitky.cc/tags/TCP/"/>
+    
+      <category term="ChannelHandler" scheme="http://bitky.cc/tags/ChannelHandler/"/>
+    
+      <category term="EventLoop" scheme="http://bitky.cc/tags/EventLoop/"/>
+    
+  </entry>
   
   <entry>
     <title>加速访问基于 Github Pages 和 Hexo 的博客</title>
@@ -352,6 +537,85 @@ target / sample-1.0.jar
       <category term="GitHub" scheme="http://bitky.cc/tags/GitHub/"/>
     
       <category term="码云" scheme="http://bitky.cc/tags/%E7%A0%81%E4%BA%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>基于 Netty 的自定义帧高可靠性读取方案</title>
+    <link href="http://bitky.cc/2017/03/26/netty/"/>
+    <id>http://bitky.cc/2017/03/26/netty/</id>
+    <published>2017-03-26T04:57:47.000Z</published>
+    <updated>2017-05-05T09:05:14.509Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文采用 Netty 这一最流行的 Java NIO 框架，作为 Java 服务器通信部分的基础框架，探索使用一个通道、一台服务器对多个客户端提供服务。</p>
+<p>完成客户端 - 服务器通信，需要基于 TCP 协议之上，自定义一套简单的通信协议，其中数据交换方式需要使用自定义帧。为实现以上方案，本文采用 Netty 框架实现 Java 服务器的通信部分。</p>
+<a id="more"></a>
+<blockquote>
+<p><strong>Netty</strong> 是由 JBoss 提供的一个 Java开源 框架。Netty 提供异步的、事件驱动的网络应用程序框架和工具，用以快速开发高性能、高可靠性的网络服务器和客户端程序。</p>
+<p>也就是说，Netty 是一个基于 NIO 的客户、服务器端编程框架，使用Netty 可以确保你快速和简单的开发出一个网络应用，例如实现了某种协议的客户，服务端应用。Netty 相当简化和流线化了网络应用的编程开发过程，例如，TCP 和 UDP 的 socket 服务开发。</p>
+</blockquote>
+<p>本项目的硬件设备集群使用 CAN 总线作为通信协议，硬件设备产生的数据和工作人员的控制指令均由服务器后端应用程序处理并存储。由于服务器并未原生支持 CAN 总线，故为了方便起见，使用「CAN转以太网」模块作为 CAN 协议和 TCP 协议交换的中介，以谋求实现的简单化。项目总体架构图如下图所示：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-e9dce2216d4609a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="项目总体架构图"></p>
+<blockquote>
+<p>CAN - bus，即控制器局域网，是国际上应用最广泛的现场总线之一。</p>
+<p>作为一种技术先进、可靠性高、功能完善、成本合理的远程网络通信控制方式，CAN - bus 已经被广泛应用到各个自动化控制系统中。从高速的网络到低价位的多路接线都可以使用 CAN - bus。例如，在汽车电子、自动控制、智能大厦、电路系统、安防监控等领域。</p>
+</blockquote>
+<h1 id="1-Netty-框架的学习"><a href="#1-Netty-框架的学习" class="headerlink" title="1. Netty 框架的学习"></a>1. Netty 框架的学习</h1><p>以下提供几篇不错的文章，帮助大家学习 Netty 这一颇受瞩目的框架。</p>
+<ol>
+<li><a href="http://ifeve.com/netty-in-action/" target="_blank" rel="external">《Netty in Action》中文版 - 并发编程网</a></li>
+<li><a href="https://waylau.com/essential-netty-in-action/" target="_blank" rel="external">Essential Netty in Action -《Netty 实战(精髓)》</a></li>
+<li><a href="https://waylau.gitbooks.io/netty-4-user-guide/" target="_blank" rel="external">Netty 4.x User Guide 中文翻译《Netty 4.x 用户指南》</a></li>
+</ol>
+<h1 id="2-Bootstrapping-服务器方案"><a href="#2-Bootstrapping-服务器方案" class="headerlink" title="2. Bootstrapping 服务器方案"></a>2. Bootstrapping 服务器方案</h1><p>以下代码是 Bootstrapping 服务器的实现方案：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KyServer</span></span>&#123;</div><div class="line">  <span class="keyword">private</span> SuccessfulListener launchListener;</div><div class="line">  <span class="keyword">private</span> SuccessfulListener finishListener;</div><div class="line">  <span class="keyword">private</span> NioEventLoopGroup group;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">new</span> Thread(() -&gt; &#123;</div><div class="line">      group = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">      ServerBootstrap bootstrap = <span class="keyword">new</span> ServerBootstrap();</div><div class="line">      bootstrap.group(group)</div><div class="line">          .channel(NioServerSocketChannel.class)</div><div class="line">          .childHandler(<span class="keyword">new</span> ServerChannelInitializerTest());</div><div class="line">      ChannelFuture channelFuture = bootstrap.bind(<span class="keyword">new</span> InetSocketAddress(<span class="number">30232</span>));</div><div class="line">      channelFuture.addListener(</div><div class="line">          (ChannelFutureListener) future -&gt; startListenerHandle(future, launchListener));</div><div class="line">    &#125;).start();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startListenerHandle</span><span class="params">(Future future, SuccessfulListener listener)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!future.isSuccess()) future.cause().printStackTrace();</div><div class="line">    <span class="keyword">if</span> (listener != <span class="keyword">null</span>) listener.onSuccess(future.isSuccess());</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setLaunchSuccessfulListener</span><span class="params">(</span></span></div><div class="line">      SuccessfulListener successfulListener) &#123;</div><div class="line">    <span class="keyword">this</span>.launchListener = successfulListener;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFinishSuccessfulListener</span><span class="params">(</span></span></div><div class="line">      SuccessfulListener finishListener) &#123;</div><div class="line">    <span class="keyword">this</span>.finishListener = finishListener;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shutdown</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (group != <span class="keyword">null</span>) &#123;</div><div class="line">      Future&lt;?&gt; futureShutdown = group.shutdownGracefully();</div><div class="line">      futureShutdown.addListener(future -&gt; startListenerHandle(future, finishListener));</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="2-1-Bootstrapping-服务器的设计要点"><a href="#2-1-Bootstrapping-服务器的设计要点" class="headerlink" title="2.1 Bootstrapping 服务器的设计要点"></a>2.1 Bootstrapping 服务器的设计要点</h2><ul>
+<li>创建一个 ServerBootstrap 实例来启动和绑定服务器</li>
+<li>创建并且分配一个 NioEventLoopgroup 实例来处理 event，比如接受新的连接和读/写数据</li>
+<li>指定本地 InetSocketAddress 到服务器绑定的端口</li>
+<li>用 ChannelHandler 实例来初始化 Channel</li>
+<li>调用 ServerBootstrap.bind() 来绑定服务器</li>
+</ul>
+<h2 id="2-2-服务器监听器的设计「观察者模式」"><a href="#2-2-服务器监听器的设计「观察者模式」" class="headerlink" title="2.2 服务器监听器的设计「观察者模式」"></a>2.2 服务器监听器的设计「观察者模式」</h2><p>首先在该类中设置成员变量：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">private SuccessfulListener launchListener;</div><div class="line">private SuccessfulListener finishListener;</div></pre></td></tr></table></figure></p>
+<p>而后添加该变量的 <code>set</code> 方法，以及监听器的处理方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">private void startListenerHandle(Future future, SuccessfulListener listener) &#123;</div><div class="line">    if (!future.isSuccess()) future.cause().printStackTrace();</div><div class="line">    if (listener != null) listener.onSuccess(future.isSuccess());</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void setLaunchSuccessfulListener(SuccessfulListener successfulListener) &#123;</div><div class="line">    this.launchListener = successfulListener;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void setFinishSuccessfulListener(SuccessfulListener finishListener) &#123;</div><div class="line">    this.finishListener = finishListener;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在服务器启动监听时，执行如下代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(30232));</div><div class="line">channelFuture.addListener(future -&gt; startListenerHandle(future, launchListener));</div></pre></td></tr></table></figure></p>
+<p>在外部关闭服务器时，执行该方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public void shutdown() &#123;</div><div class="line">    if (group != null) &#123;</div><div class="line">        Future&lt;?&gt; futureShutdown = group.shutdownGracefully();</div><div class="line">        futureShutdown.addListener(future -&gt; startListenerHandle(future, finishListener));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>通过如上方法，外部操作者可以方便得知服务器是否启动成功以及是否结束成功，使用观察者模式，完美实现了对服务器启动及关闭的监听。</p>
+<h1 id="3-服务器业务逻辑的实现"><a href="#3-服务器业务逻辑的实现" class="headerlink" title="3. 服务器业务逻辑的实现"></a>3. 服务器业务逻辑的实现</h1><p>首先使用初始化方法 <code>ServerChannelInitializer</code> 完成所有 <code>ChannelHandler</code> 对 <code>Channel</code> 的绑定操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerChannelInitializer</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">NioSocketChannel</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(NioSocketChannel ch)</span> </span>&#123;</div><div class="line">        ch.pipeline().addLast(<span class="keyword">new</span> LoggingHandler(<span class="string">"NO1"</span>));</div><div class="line">        <span class="keyword">byte</span> head = <span class="number">0x11</span>;</div><div class="line">        ch.pipeline().addLast(<span class="keyword">new</span> FrameIdentifierChannelInboundHandler(head));</div><div class="line">        ch.pipeline().addLast(<span class="keyword">new</span> ShowByteBufAsFrameInBoundHandler());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="3-1-输入数据处理方案"><a href="#3-1-输入数据处理方案" class="headerlink" title="3.1 输入数据处理方案"></a>3.1 输入数据处理方案</h2><h3 id="3-1-1-自定义帧方案"><a href="#3-1-1-自定义帧方案" class="headerlink" title="3.1.1 自定义帧方案"></a>3.1.1 自定义帧方案</h3><p>自定义帧包括「帧标识位」、「数据长度」、「数据体」，如下图所示，：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-1e3784eb89e41957.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="自定义帧示意图"></p>
+<ul>
+<li>帧标识位：0x11。</li>
+<li>数据长度：两个字节，可表示数据部分大小最大为 2 ^ 16 - 1 。</li>
+<li>数据体：实际有用的数据。</li>
+</ul>
+<h3 id="3-1-2-输入数据处理器"><a href="#3-1-2-输入数据处理器" class="headerlink" title="3.1.2 输入数据处理器"></a>3.1.2 输入数据处理器</h3><p>以下为输入数据的第一个处理器，可以保证无论 TCP 帧经历怎样的粘包、拆包，均可以准确提取每一个自定义帧的数据部分。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 入端自定义帧提取处理器</div><div class="line"> * 将数据流提取出完整的自定义帧并传入下一个处理器</div><div class="line"> */</div><div class="line">public class FrameIdentifierChannelInboundHandler extends SimpleChannelInboundHandler&lt;ByteBuf&gt; &#123;</div><div class="line">  private byte[] frameHead;</div><div class="line">  private int frameHeadLength;</div><div class="line">  private int frameBodyLength;</div><div class="line">  private FrameReceivedEnum frameStatus = FrameReceivedEnum.READY;</div><div class="line">  private ByteBuf holdByteBuf = Unpooled.buffer(1024);</div><div class="line"></div><div class="line">  FrameIdentifierChannelInboundHandler(byte... frameHead) &#123;</div><div class="line">    this();</div><div class="line">    this.frameHead = frameHead;</div><div class="line">    frameHeadLength = frameHead.length;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  protected void channelRead0 (ChannelHandlerContext ctx, ByteBuf msg) &#123;</div><div class="line">    //数据读入本地buffer</div><div class="line">    holdByteBuf.writeBytes(msg);</div><div class="line">    while (true) &#123;</div><div class="line">      //若读取状态为: 开始读取</div><div class="line">      if (frameStatus == FrameReceivedEnum.READY) &#123;</div><div class="line">        if (!matchFrameHead(holdByteBuf)) &#123;</div><div class="line">          holdByteBuf.clear();</div><div class="line">          break;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      //若读取状态为: 帧长读取</div><div class="line">      //数据体完全包含在 buffer 内，则可通过此状态</div><div class="line">      if (frameStatus == FrameReceivedEnum.READING_LENGTH) &#123;</div><div class="line">        if (holdByteBuf.readableBytes() &lt;= 1) break;</div><div class="line">        //无符号 short 需要用 int 型引用</div><div class="line">        int currentFrameLength = holdByteBuf.getUnsignedShort(holdByteBuf.readerIndex());</div><div class="line"></div><div class="line">        //可读byte数为长度计数(2)+数据体长度; 所以当前帧长+2 &lt;= 可读帧长</div><div class="line">        if (currentFrameLength + 2 &lt;= holdByteBuf.readableBytes()) &#123;</div><div class="line">          frameBodyLength = holdByteBuf.readUnsignedShort();</div><div class="line">          frameStatus = FrameReceivedEnum.READING_BODY;</div><div class="line">        &#125; else &#123;</div><div class="line">          break;</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      //若读取状态为: 数据体读取</div><div class="line">      //预设数据体完全包含在buffer内，否则抛出异常</div><div class="line">      if (frameStatus == FrameReceivedEnum.READING_BODY) &#123;</div><div class="line">        if (frameBodyLength == 0) &#123;</div><div class="line">          frameStatus = FrameReceivedEnum.READY;</div><div class="line">          frameBodyLength = -1;</div><div class="line">          holdByteBuf.discardReadBytes();</div><div class="line">        &#125; else if (frameBodyLength &gt; 0) &#123;</div><div class="line">          ByteBuf returnBuf = Unpooled.buffer(frameBodyLength);</div><div class="line">          holdByteBuf.readBytes(returnBuf);</div><div class="line">          frameStatus = FrameReceivedEnum.READY;</div><div class="line">          //    ctx.fireChannelRead(returnBuf);</div><div class="line">          ctx.writeAndFlush(returnBuf);</div><div class="line">          frameBodyLength = -1;</div><div class="line">          holdByteBuf.discardReadBytes();</div><div class="line">        &#125; else &#123;</div><div class="line">          throw new FrameLoadException(&quot;自定义帧长度计数异常&quot;);</div><div class="line">        &#125;</div><div class="line">      &#125; else &#123;</div><div class="line">        throw new FrameLoadException(&quot;自定义帧读取异常&quot;);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  private boolean matchFrameHead(ByteBuf byteBuf) &#123;</div><div class="line">    while (true) &#123;</div><div class="line">      if (byteBuf.readableBytes() &lt; frameHeadLength) &#123;</div><div class="line">        return false;</div><div class="line">      &#125;</div><div class="line">      if (frameHead[0] == byteBuf.readByte()) &#123;</div><div class="line">        frameStatus = FrameReceivedEnum.READING_LENGTH;</div><div class="line">        return true;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以下为第二个输入数据处理器，可将前一处理器的结果「优雅」打印到控制台上并原样发送至客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public class ShowByteBufAsFrameInBoundHandler extends SimpleChannelInboundHandler&lt;ByteBuf&gt; &#123;</div><div class="line">  </div><div class="line">    @Override</div><div class="line">    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) &#123;</div><div class="line">        System.out.println(ByteBufUtil.prettyHexDump(byteBuf));</div><div class="line">        ctx.pipeline().writeAndFlush(Unpooled.copiedBuffer(msg));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="4-参考链接"><a href="#4-参考链接" class="headerlink" title="4. 参考链接"></a>4. 参考链接</h1><ol>
+<li><a href="http://www.gzenpu.com/CANToTcp.html" target="_blank" rel="external">CAN 转以太网设备介绍</a></li>
+<li><a href="http://baike.baidu.com/item/netty" target="_blank" rel="external">Netty - 百度百科</a></li>
+<li><a href="http://ifeve.com/netty-in-action/" target="_blank" rel="external">《Netty in Action》中文版 - 并发编程网</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文采用 Netty 这一最流行的 Java NIO 框架，作为 Java 服务器通信部分的基础框架，探索使用一个通道、一台服务器对多个客户端提供服务。&lt;/p&gt;
+&lt;p&gt;完成客户端 - 服务器通信，需要基于 TCP 协议之上，自定义一套简单的通信协议，其中数据交换方式需要使用自定义帧。为实现以上方案，本文采用 Netty 框架实现 Java 服务器的通信部分。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Java" scheme="http://bitky.cc/categories/Java/"/>
+    
+    
+      <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
+    
+      <category term="Netty" scheme="http://bitky.cc/tags/Netty/"/>
+    
+      <category term="TCP" scheme="http://bitky.cc/tags/TCP/"/>
     
   </entry>
   
@@ -1348,6 +1612,62 @@ plugins/accessible/qtaccessiblewidgets.dll
   </entry>
   
   <entry>
+    <title>「转」识别独立安卓设备</title>
+    <link href="http://bitky.cc/2016/04/15/device/"/>
+    <id>http://bitky.cc/2016/04/15/device/</id>
+    <published>2016-04-15T04:57:47.000Z</published>
+    <updated>2017-04-11T04:34:36.070Z</updated>
+    
+    <content type="html"><![CDATA[<p>通过生成唯一的识别码，识别独立的安卓手机的几种方法</p>
+<blockquote>
+<p><strong>本文转载自</strong>：<a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/" target="_blank" rel="external">难题：识别独立安卓设备 - 「A WING BY WIND」</a></p>
+</blockquote>
+<a id="more"></a>
+<p>今天碰巧朋友问到我怎么识别独立的安卓手机，就花了一些时间琢磨了一下。其实这个问题可以秒答，就是 IMEI 。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">TelephonyManager.getDeviceId();</div></pre></td></tr></table></figure>
+<p>这需要一个权限：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.READ_PHONE_STATE"</span> /&gt;</span></div></pre></td></tr></table></figure>
+<p>问题如果这么简单就好了，问题在于：</p>
+<ul>
+<li>平板等其他设备，无 SIM 卡，因此无 Telephony 模块。</li>
+<li>有些设备恢复出厂设置的操作会清空 IMEI「水货硬解通常会导致这个结果」</li>
+<li>我国许多山寨手机厂商偷懒，刷机不改 IMEI，所以 IMEI 都是一样的</li>
+</ul>
+<p>因此其实问题从这里才开始。网上能够搜索到的解决方案有以下几点：</p>
+<h1 id="1-WIFI-MAC"><a href="#1-WIFI-MAC" class="headerlink" title="1. WIFI MAC"></a>1. WIFI MAC</h1><p>一个方案是优先采用 IMEI，当 IMEI 相同时，再比较 WIFI 的 MAC 地址。但如果手机没有 WIFI 功能或者 WIFI 功能没有开启「飞行模式」，则无法获取到 MAC 地址。更加让人惆怅的是，我国大山寨厂商实在是懒透了，无线网卡的 MAC 地址居然也不修改，不少自刷机的也是这病情「例如这个，这个还有这个」。至于说蓝牙 MAC 地址就更别说了。IMEI 重复的病因，与 MAC 地址相同的其实是一个原因，都是刷机或山寨，所以这「WIFI MAC」地址的方案其实算不上互补了，必须另谋途径。</p>
+<h1 id="2-Serial-NO"><a href="#2-Serial-NO" class="headerlink" title="2. Serial NO"></a>2. Serial NO</h1><p>另一个方案是用 serial NO 。这个值仅在 Android 2.3 版本以上才提供支持。通过 adb 可以这样查看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell getprop ro.serialno</div></pre></td></tr></table></figure>
+<p>代码中可使用系统变量 <code>android.os.Build.SERIAL</code> 访问。如果这个值能够取到这是仅次于 IMEI 的最好方法了。缺点是这个值在 2.2 及以下版本的 Android 系统不支持。不过好在如今的安卓世界 2.2 及以下的占有率已经越来越低了，翻新速度很快，因此这个值很值得一试。</p>
+<h1 id="3-Android-ID"><a href="#3-Android-ID" class="headerlink" title="3. Android ID"></a>3. Android ID</h1><p>其实安卓系统提供了 <code>Settings.Secure.ANDROID_ID</code> 来获取唯一设备号。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> android.provider.Settings.Secure;</div><div class="line"></div><div class="line"><span class="keyword">private</span> String android_id = Secure.getString(</div><div class="line">                            getContext().getContentResolver(),</div><div class="line">                            Secure.ANDROID_ID);</div></pre></td></tr></table></figure>
+<p>但同样 2.2 以前的系统支持得不好。这个值是系统初次启动后生成的，因此恢复出厂设置后这个值会变，导致观测到的设备数虚高。在手机刷机、重置频繁的环境，这个值是不靠谱的。另外某大厂生产的设备居然有个 BUG，这个值是会重复的「DROID2」，因此这个值还是别用为好。</p>
+<h1 id="4-Generated-UUID"><a href="#4-Generated-UUID" class="headerlink" title="4. Generated UUID"></a>4. Generated UUID</h1><p>最后还有一个自己生成 UUID 的办法，保存这个 ID，每次访问服务器时上传，自己告诉系统自己是谁。这个方法比所有硬件方法都更不靠谱，因为只需卸载软件和清理数据就会导致这个值被删除，从而产生新的 UUID，造成观测到的设备数量虚高。更别说刷机和恢复出厂设置了。这个方法非常适合用来统计软件安装次数，而非独立设备数。</p>
+<h1 id="5-结论"><a href="#5-结论" class="headerlink" title="5. 结论"></a>5. 结论</h1><p>综上所述，目前为止我还没找到非常完美的统计独立设备的方案，尤其是在中国这个水货、硬解、山寨、刷机市场泛滥和不规范的安卓世界，更是难上加难。</p>
+<p>但是反过来想，是不是一台完全刷新，安装了全新的 ROM 的手机，就已经不是原来的那台手机了呢？统计独立设备数的目的究竟是什么？如果要的是独立活跃设备数，其实用自己生成的 UUID 已经足够，因为原来使用的那个 UUID 已经失去活性，可以忽略了。对于 APP 开发者而言这个情况与用户换了一台手机，完全弃用旧手机的情况其实是一样的。假如是采取活跃 UUID 的方式，则即使是使用 ANDROID_ID 或者自己生成的 UUID 都是可取的做法了。</p>
+<h1 id="6-文章来源："><a href="#6-文章来源：" class="headerlink" title="6. 文章来源："></a>6. 文章来源：</h1><ol>
+<li><a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/" target="_blank" rel="external">难题：识别独立安卓设备</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;通过生成唯一的识别码，识别独立的安卓手机的几种方法&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;本文转载自&lt;/strong&gt;：&lt;a href=&quot;http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/&quot;&gt;难题：识别独立安卓设备 - 「A WING BY WIND」&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+      <category term="其他" scheme="http://bitky.cc/categories/%E5%85%B6%E4%BB%96/"/>
+    
+    
+      <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
+    
+      <category term="Android" scheme="http://bitky.cc/tags/Android/"/>
+    
+  </entry>
+  
+  <entry>
     <title>「转」电子地图坐标系统研究整理</title>
     <link href="http://bitky.cc/2016/04/15/location/"/>
     <id>http://bitky.cc/2016/04/15/location/</id>
@@ -1448,63 +1768,7 @@ plugins/accessible/qtaccessiblewidgets.dll
     
       <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
     
-      <category term="Android" scheme="http://bitky.cc/tags/Android/"/>
-    
       <category term="坐标" scheme="http://bitky.cc/tags/%E5%9D%90%E6%A0%87/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>「转」识别独立安卓设备</title>
-    <link href="http://bitky.cc/2016/04/15/device/"/>
-    <id>http://bitky.cc/2016/04/15/device/</id>
-    <published>2016-04-15T04:57:47.000Z</published>
-    <updated>2017-04-11T04:34:36.070Z</updated>
-    
-    <content type="html"><![CDATA[<p>通过生成唯一的识别码，识别独立的安卓手机的几种方法</p>
-<blockquote>
-<p><strong>本文转载自</strong>：<a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/" target="_blank" rel="external">难题：识别独立安卓设备 - 「A WING BY WIND」</a></p>
-</blockquote>
-<a id="more"></a>
-<p>今天碰巧朋友问到我怎么识别独立的安卓手机，就花了一些时间琢磨了一下。其实这个问题可以秒答，就是 IMEI 。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">TelephonyManager.getDeviceId();</div></pre></td></tr></table></figure>
-<p>这需要一个权限：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">uses-permission</span> <span class="attr">android:name</span>=<span class="string">"android.permission.READ_PHONE_STATE"</span> /&gt;</span></div></pre></td></tr></table></figure>
-<p>问题如果这么简单就好了，问题在于：</p>
-<ul>
-<li>平板等其他设备，无 SIM 卡，因此无 Telephony 模块。</li>
-<li>有些设备恢复出厂设置的操作会清空 IMEI「水货硬解通常会导致这个结果」</li>
-<li>我国许多山寨手机厂商偷懒，刷机不改 IMEI，所以 IMEI 都是一样的</li>
-</ul>
-<p>因此其实问题从这里才开始。网上能够搜索到的解决方案有以下几点：</p>
-<h1 id="1-WIFI-MAC"><a href="#1-WIFI-MAC" class="headerlink" title="1. WIFI MAC"></a>1. WIFI MAC</h1><p>一个方案是优先采用 IMEI，当 IMEI 相同时，再比较 WIFI 的 MAC 地址。但如果手机没有 WIFI 功能或者 WIFI 功能没有开启「飞行模式」，则无法获取到 MAC 地址。更加让人惆怅的是，我国大山寨厂商实在是懒透了，无线网卡的 MAC 地址居然也不修改，不少自刷机的也是这病情「例如这个，这个还有这个」。至于说蓝牙 MAC 地址就更别说了。IMEI 重复的病因，与 MAC 地址相同的其实是一个原因，都是刷机或山寨，所以这「WIFI MAC」地址的方案其实算不上互补了，必须另谋途径。</p>
-<h1 id="2-Serial-NO"><a href="#2-Serial-NO" class="headerlink" title="2. Serial NO"></a>2. Serial NO</h1><p>另一个方案是用 serial NO 。这个值仅在 Android 2.3 版本以上才提供支持。通过 adb 可以这样查看：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">adb shell getprop ro.serialno</div></pre></td></tr></table></figure>
-<p>代码中可使用系统变量 <code>android.os.Build.SERIAL</code> 访问。如果这个值能够取到这是仅次于 IMEI 的最好方法了。缺点是这个值在 2.2 及以下版本的 Android 系统不支持。不过好在如今的安卓世界 2.2 及以下的占有率已经越来越低了，翻新速度很快，因此这个值很值得一试。</p>
-<h1 id="3-Android-ID"><a href="#3-Android-ID" class="headerlink" title="3. Android ID"></a>3. Android ID</h1><p>其实安卓系统提供了 <code>Settings.Secure.ANDROID_ID</code> 来获取唯一设备号。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> android.provider.Settings.Secure;</div><div class="line"></div><div class="line"><span class="keyword">private</span> String android_id = Secure.getString(</div><div class="line">                            getContext().getContentResolver(),</div><div class="line">                            Secure.ANDROID_ID);</div></pre></td></tr></table></figure>
-<p>但同样 2.2 以前的系统支持得不好。这个值是系统初次启动后生成的，因此恢复出厂设置后这个值会变，导致观测到的设备数虚高。在手机刷机、重置频繁的环境，这个值是不靠谱的。另外某大厂生产的设备居然有个 BUG，这个值是会重复的「DROID2」，因此这个值还是别用为好。</p>
-<h1 id="4-Generated-UUID"><a href="#4-Generated-UUID" class="headerlink" title="4. Generated UUID"></a>4. Generated UUID</h1><p>最后还有一个自己生成 UUID 的办法，保存这个 ID，每次访问服务器时上传，自己告诉系统自己是谁。这个方法比所有硬件方法都更不靠谱，因为只需卸载软件和清理数据就会导致这个值被删除，从而产生新的 UUID，造成观测到的设备数量虚高。更别说刷机和恢复出厂设置了。这个方法非常适合用来统计软件安装次数，而非独立设备数。</p>
-<h1 id="5-结论"><a href="#5-结论" class="headerlink" title="5. 结论"></a>5. 结论</h1><p>综上所述，目前为止我还没找到非常完美的统计独立设备的方案，尤其是在中国这个水货、硬解、山寨、刷机市场泛滥和不规范的安卓世界，更是难上加难。</p>
-<p>但是反过来想，是不是一台完全刷新，安装了全新的 ROM 的手机，就已经不是原来的那台手机了呢？统计独立设备数的目的究竟是什么？如果要的是独立活跃设备数，其实用自己生成的 UUID 已经足够，因为原来使用的那个 UUID 已经失去活性，可以忽略了。对于 APP 开发者而言这个情况与用户换了一台手机，完全弃用旧手机的情况其实是一样的。假如是采取活跃 UUID 的方式，则即使是使用 ANDROID_ID 或者自己生成的 UUID 都是可取的做法了。</p>
-<h1 id="6-文章来源："><a href="#6-文章来源：" class="headerlink" title="6. 文章来源："></a>6. 文章来源：</h1><ol>
-<li><a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/" target="_blank" rel="external">难题：识别独立安卓设备</a></li>
-</ol>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;通过生成唯一的识别码，识别独立的安卓手机的几种方法&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&lt;strong&gt;本文转载自&lt;/strong&gt;：&lt;a href=&quot;http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/&quot;&gt;难题：识别独立安卓设备 - 「A WING BY WIND」&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-    
-    </summary>
-    
-      <category term="其他" scheme="http://bitky.cc/categories/%E5%85%B6%E4%BB%96/"/>
-    
-    
-      <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
     
       <category term="Android" scheme="http://bitky.cc/tags/Android/"/>
     
