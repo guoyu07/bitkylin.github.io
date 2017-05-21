@@ -1,0 +1,845 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,GUI,JavaFX,Scene Builder,自定义控件," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文探讨在 JavaFX 8 环境下实现自定义控件的相关方法，以及自定义控件在流式布局中的布置方式，由于自定义控件使用时需要同时引用布局文件和控制器类，较为繁琐，故也探讨了其简化方式。">
+<meta name="keywords" content="Java,GUI,JavaFX,Scene Builder,自定义控件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaFX 8 下简化自定义控件的外部调用以及流式布局示例">
+<meta property="og:url" content="http://bitky.cc/2017/05/21/javafx/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="本文探讨在 JavaFX 8 环境下实现自定义控件的相关方法，以及自定义控件在流式布局中的布置方式，由于自定义控件使用时需要同时引用布局文件和控制器类，较为繁琐，故也探讨了其简化方式。">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-32555c9418d60498.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-00ef0c734266ab49.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-28ee3302a0c184ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-05-21T15:27:31.819Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaFX 8 下简化自定义控件的外部调用以及流式布局示例">
+<meta name="twitter:description" content="本文探讨在 JavaFX 8 环境下实现自定义控件的相关方法，以及自定义控件在流式布局中的布置方式，由于自定义控件使用时需要同时引用布局文件和控制器类，较为繁琐，故也探讨了其简化方式。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-32555c9418d60498.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2017/05/21/javafx/"/>
+
+
+
+
+
+  <title> JavaFX 8 下简化自定义控件的外部调用以及流式布局示例 | 比特麒麟 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?d990164c500ef11b3679defe3c7305a8";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2017/05/21/javafx/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JavaFX 8 下简化自定义控件的外部调用以及流式布局示例
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-21T12:57:47+08:00">
+                2017-05-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/05/21/javafx/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文探讨在 JavaFX 8 环境下实现自定义控件的相关方法，以及自定义控件在流式布局中的布置方式，由于自定义控件使用时需要同时引用布局文件和控制器类，较为繁琐，故也探讨了其简化方式。</p>
+<a id="more"></a>
+<p>有一个项目，需要模拟数千台设备的工作情况，这数千个设备分为若干组，每组 100 台。故需要设计一款 GUI 程序，包含 100 个自定义控件，模拟一组设备的工作情况，通过 ListView 对设备组进行选择，即可成功模拟数千台设备。</p>
+<p>由于 Java 拥有丰富的第三方库，便于项目的底层实现，故基于最新的 Java GUI 框架「JavaFX 8」实现该 GUI 界面，该应用程序需使用 100 个相同的自定义控件，故需要使用流面板 (FlowPane) 对这些自定义控件进行有效布局。</p>
+<p>最终实现效果如下图所示：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-32555c9418d60498.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="最终实现效果"></p>
+<p>FlowPane 布局面板中包含的自定义控件会在水平方向上按行连续地平铺放置，并且会在边界处自动换行，点击左侧 ListView 中的 Item，右侧的自定义控件组会显示选定设备组的状态信息。综上，该设计可实现预定目标。</p>
+<h2 id="1-Java-FX-8-基本说明"><a href="#1-Java-FX-8-基本说明" class="headerlink" title="1. Java FX 8 基本说明"></a>1. Java FX 8 基本说明</h2><p>可以使用这篇「<a href="http://code.makery.ch/library/javafx-8-tutorial/zh-cn/" target="_blank" rel="external">JavaFX 8 教程</a>」作为 JavaFX 8 的入门使用，拥有 GUI 设计经验的开发人员均可快速入门 Java FX 8，</p>
+<h3 id="1-1-界面生成方式"><a href="#1-1-界面生成方式" class="headerlink" title="1.1 界面生成方式"></a>1.1 界面生成方式</h3><p>Java FX 8 与大多数现代 GUI 开发相同，用户界面有两种创建方式：</p>
+<ul>
+<li>XML文件定义</li>
+<li>java代码创建</li>
+</ul>
+<p>本文为了更加清晰直观，采用两种界面布局方法相结合的方式。</p>
+<h3 id="1-2-问题说明"><a href="#1-2-问题说明" class="headerlink" title="1.2 问题说明"></a>1.2 问题说明</h3><p>由于 Java FX 8 并不主流，遇到问题很难在中文网站上找到解决方法，故有许多坑需要填补，所以本文遇到一些坑时不进行说明，而是在另一篇文章中列出了这些坑的填补方法。</p>
+<h2 id="2-界面根布局的设计"><a href="#2-界面根布局的设计" class="headerlink" title="2. 界面根布局的设计"></a>2. 界面根布局的设计</h2><p>使用「Scene Builder」打开 FXML 布局文件，在如图所示左下角，填入一个自定义 Class 作为控制器类，激活需要操作的控件，在右侧「fx:id」处填入 Class 的 Field，下方填入事件处理方法，之后通过 View -&gt; Show Sample Controller skeleton 可查看填入 Controller 中的代码示例。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-00ef0c734266ab49.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Scene Builder"></p>
+<p>在程序的入口类中填入如下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> <span class="keyword">extends</span> <span class="title">Application</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">//入口方法已隐式实现，故可删除</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        launch(args);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(Stage primaryStage)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">        primaryStage.setTitle(<span class="string">"bitkyApp"</span>);</div><div class="line">        FXMLLoader fxmlLoader = <span class="keyword">new</span> FXMLLoader(getClass().getResource(<span class="string">"sample.fxml"</span>));</div><div class="line">        AnchorPane anchorPane = fxmlLoader.load();           <span class="comment">//返回类型设置为布局文件根节点类型</span></div><div class="line">        Controller controller = fxmlLoader.getController();  <span class="comment">//可获取该布局的 Controller 类</span></div><div class="line"></div><div class="line">        BorderPane rootLayout = FXMLLoader.load(getClass().getResource(<span class="string">"rootLayout.fxml"</span>));</div><div class="line">        rootLayout.setCenter(anchorPane);</div><div class="line">        primaryStage.setScene(<span class="keyword">new</span> Scene(rootLayout, <span class="number">800</span>, <span class="number">650</span>));</div><div class="line">        primaryStage.show();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>该方法为教程中的方法，为了实现 Controller 和外部的交互，将 FXML 布局文件和 Controller 均耦合在了外部类中，显得较为繁琐。故可采用自定义控件的方式简化外部的代码调用。</p>
+<h2 id="3-自定义控件的设计"><a href="#3-自定义控件的设计" class="headerlink" title="3. 自定义控件的设计"></a>3. 自定义控件的设计</h2><blockquote>
+<p>JavaFX 2 版本之后，FXML 提供 <fx:root> 写法，此时要求 Controller 必须继承自 FXML 节点对象，使用 FXMLLoader 加载时，必须调用 setRoot() 方法。</fx:root></p>
+<p>不要在 FXML 中指定 Controller，通常情况下一个 FXML 可以对应多个 Controller，为了灵活性，我们应当在 FXMLLoader 中指定 Controller。</p>
+</blockquote>
+<p>根据具体实践，可以采用如下方式：</p>
+<p>Scene Builder 左下角的 Controller 面板中，勾选使用 fx:root 构造，并且不应该填入 Controller 类，如图，此时 <fx:root> 作为根节点，：</fx:root></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-28ee3302a0c184ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="实现自定义控件的 Scene Builder 相关设置"></p>
+<p>此时在 FXML 文件中的代码例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;fx:root xmlns:fx="http://javafx.com/fxml/1"</div><div class="line">         type="TabPane"</div><div class="line">         xmlns="http://javafx.com/javafx/8.0.111"&gt;</div><div class="line">    </div><div class="line">......</div><div class="line"></div><div class="line">&lt;/fx:root&gt;</div></pre></td></tr></table></figure>
+<p>此时，Controller 类继承根节点的类型，例如「TabPane」。可选实现「Initializable」接口进行控件生成之后的初始化操作，代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Controller 类继承 FXML 布局文件的根节点类型「TabPane」</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DeviceView</span> <span class="keyword">extends</span> <span class="title">TabPane</span> <span class="keyword">implements</span> <span class="title">Initializable</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DeviceView</span><span class="params">()</span> </span>&#123;</div><div class="line">        loadFxml();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">loadFxml</span><span class="params">()</span> </span>&#123;</div><div class="line">        FXMLLoader loader = <span class="keyword">new</span> FXMLLoader(getClass().getResource(<span class="string">"device_view.fxml"</span>));</div><div class="line">        loader.setRoot(<span class="keyword">this</span>);</div><div class="line">        loader.setController(<span class="keyword">this</span>);</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            loader.load();</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//该方法在构造方法执行完毕后执行</span></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">(URL location, ResourceBundle resources)</span> </span>&#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此时，在主布局对应的 Controller 中，直接生成该类「DeviceView」的对象作为自定义控件，通过 FlowPane 控件的引用添加该对象为 FlowPane 的子控件，即可实现设计目的，具体代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">100</span>; i++) &#123;</div><div class="line"></div><div class="line">    <span class="comment">//在 FlowPane 中添加自定义控件「DeviceView」</span></div><div class="line">    DeviceView deviceView = <span class="keyword">new</span> DeviceView(i);</div><div class="line">    deviceFlowPane.getChildren().add(deviceView);</div><div class="line">	</div><div class="line">	<span class="comment">//使用观察者模式添加子控件「DeviceView」的监听器</span></div><div class="line">    deviceView.setListener((status -&gt; &#123;</div><div class="line">        <span class="keyword">if</span> (listener != <span class="keyword">null</span>) listener.btnChanged(status);</div><div class="line">    &#125;));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="4-使用自定义控件的方式简化主界面的外部调用代码"><a href="#4-使用自定义控件的方式简化主界面的外部调用代码" class="headerlink" title="4. 使用自定义控件的方式简化主界面的外部调用代码"></a>4. 使用自定义控件的方式简化主界面的外部调用代码</h2><p>综上所述，最终实现的主界面代码示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainView</span> <span class="keyword">extends</span> <span class="title">BorderPane</span> <span class="keyword">implements</span> <span class="title">Initializable</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> MainView mainView;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="title">MainView</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        FXMLLoader loader = <span class="keyword">new</span> FXMLLoader(getClass().getResource(<span class="string">"rootLayout.fxml"</span>));</div><div class="line">        loader.setRoot(<span class="keyword">this</span>);</div><div class="line">        loader.setController(<span class="keyword">this</span>);</div><div class="line">        loader.load();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> MainView <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (mainView == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                mainView = <span class="keyword">new</span> MainView();</div><div class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> mainView;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">(URL location, ResourceBundle resources)</span> </span>&#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此段代码使用了自定义控件的方式，并且使用了单例模式中的懒汉式方便外部调用，外部调用代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainLauncher</span> <span class="keyword">extends</span> <span class="title">Application</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(Stage primaryStage)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">           startApp(primaryStage);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startApp</span><span class="params">(Stage primaryStage)</span> </span>&#123;</div><div class="line">        primaryStage.setTitle(<span class="string">"设备模拟客户端"</span>);</div><div class="line">        primaryStage.setScene(<span class="keyword">new</span> Scene(MainView.getInstance()));</div><div class="line">        primaryStage.setMaximized(<span class="keyword">true</span>);</div><div class="line">        primaryStage.show();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5. 参考资料"></a>5. 参考资料</h2><ol>
+<li><a href="http://www.javafxchina.net/blog/2015/06/doc05_buildinlayout/" target="_blank" rel="external">使用内置的布局面板</a></li>
+<li><a href="http://code.makery.ch/library/javafx-8-tutorial/zh-cn/" target="_blank" rel="external">JavaFX 8 教程「中文」</a></li>
+<li><a href="https://docs.oracle.com/javase/8/javafx/api/" target="_blank" rel="external">JavaFX 8 API Document</a></li>
+<li><a href="http://gluonhq.com/products/scene-builder/" target="_blank" rel="external">Gluon Scene Builder</a></li>
+<li><a href="http://zhk.me/832.html" target="_blank" rel="external">JavaFX 创建自定义控件</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/GUI/" rel="tag"># GUI</a>
+          
+            <a href="/tags/JavaFX/" rel="tag"># JavaFX</a>
+          
+            <a href="/tags/Scene-Builder/" rel="tag"># Scene Builder</a>
+          
+            <a href="/tags/自定义控件/" rel="tag"># 自定义控件</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/05/netty/" rel="prev" title="Netty 框架总结「ChannelHandler 及 EventLoop」">
+                Netty 框架总结「ChannelHandler 及 EventLoop」 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/u/bd2e386a6ea8" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-book"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-truck"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="/about" target="_blank" title="个人资料">
+                  
+                    <i class="fa fa-fw fa-user-circle-o"></i>
+                  
+                  个人资料
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Java-FX-8-基本说明"><span class="nav-number">1.</span> <span class="nav-text">1. Java FX 8 基本说明</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-界面生成方式"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 界面生成方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-问题说明"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 问题说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-界面根布局的设计"><span class="nav-number">2.</span> <span class="nav-text">2. 界面根布局的设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-自定义控件的设计"><span class="nav-number">3.</span> <span class="nav-text">3. 自定义控件的设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-使用自定义控件的方式简化主界面的外部调用代码"><span class="nav-number">4.</span> <span class="nav-text">4. 使用自定义控件的方式简化主界面的外部调用代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-参考资料"><span class="nav-number">5.</span> <span class="nav-text">5. 参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "5178499c967d4c549637abc4a929a2d6",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
