@@ -267,6 +267,184 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2017/05/22/javafx/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/05/22/javafx/" itemprop="url">
+                  Maven 集成 JavaFX 8 以及「fx:root」问题探讨
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-22T13:17:47+08:00">
+                2017-05-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 <code>&lt;fx:root&gt;</code> 根节点问题。</p>
+<h1 id="1-Maven-构建的程序未集成-FXML-布局文件"><a href="#1-Maven-构建的程序未集成-FXML-布局文件" class="headerlink" title="1. Maven 构建的程序未集成 FXML 布局文件"></a>1. Maven 构建的程序未集成 FXML 布局文件</h1><p>使用 Maven 直接构建，在 <code>compile</code> 阶段, <code>.class</code> 文件均被复制到 <code>target/classes/</code> 目录，而对于 <code>.FXML</code> 文件，则分如下情况：</p>
+<ol>
+<li><p><code>simple.fxml</code> 文件位于 <code>src/main/resources/</code> 目录中，在 <code>compile</code> 阶段，<code>simple.fxml</code> 会按照层级复制到 <code>target/classes/</code> 目录中，执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">getClass().getClassLoader().getResource(&quot;simple.fxml&quot;)</div><div class="line">getClass().getResource(&quot;/simple.fxml&quot;)</div></pre></td></tr></table></figure>
+</li>
+<li><p>为了方便使用，<code>simple.fxml</code> 文件位于其 Controller 的同级目录中，此时在 <code>compile</code> 阶段，<code>simple.fxml</code> 会被忽略掉，Maven 不会复制位于 <code>src</code> 目录下的任何资源文件，故需要采取其他策略，通过搜索 <a href="http://stackoverflow.com/questions/22000423/javafx-and-maven-nullpointerexception-location-is-required" target="_blank" rel="external"><code>StackOverflow</code></a> 发现了解决方法如下：</p>
+<blockquote>
+<p>在 <code>pom.xml</code> 文件中添加如下 <code>resource</code> 插件即可解决问题：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">    ...</div><div class="line">    <span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">resource</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">filtering</span>&gt;</span>false<span class="tag">&lt;/<span class="name">filtering</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>src/main/java<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*.fxml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span>             </div><div class="line">        <span class="tag">&lt;/<span class="name">resource</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">    ...</div><div class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ol>
+<p>此时所有的 <code>.fxml</code> 文件均会被完整复制到 <code>src</code> 下的同级目录。</p>
+<p>使用 Maven 构建可执行 Jar 可使用通用方法，具体参考：<a href="http://www.jianshu.com/p/b3cbcebd8e28" target="_blank" rel="external">镜像1</a>、<a href="http://bitky.cc/2017/04/06/maven/">镜像2</a></p>
+<p>可执行 Jar 构建完毕后，在 Windows 平台下可以直接双击执行。</p>
+<h1 id="2-FXML-文件中，「fx-root」根节点问题探讨"><a href="#2-FXML-文件中，「fx-root」根节点问题探讨" class="headerlink" title="2. FXML 文件中，「fx:root」根节点问题探讨"></a>2. FXML 文件中，「fx:root」根节点问题探讨</h1><p>为了更加方便灵活地使用自定义控件，更方便的集成 Controller 和 FXML 资源文件，以下内容对 <a href="http://stackoverflow.com/questions/23600926/how-to-understand-and-use-fxroot-in-javafx" target="_blank" rel="external"><code>StackOverflow</code></a> 的一则回复进行翻译修改：</p>
+<p>假设想要设计一个自定义控件：<code>HBox</code> 中包含 <code>TextField</code> 和 <code>Button</code>，不使用 <code>FXML</code> 文件时，自定义控件设计如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyComponent</span> <span class="keyword">extends</span> <span class="title">HBox</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> TextField textField ;</div><div class="line">    <span class="keyword">private</span> Button button ;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyComponent</span><span class="params">()</span> </span>&#123;</div><div class="line">        textField = <span class="keyword">new</span> TextField();</div><div class="line">        button = <span class="keyword">new</span> Button();</div><div class="line">        <span class="keyword">this</span>.getChildren().addAll(textField, button);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此时可对该自定义控件方便地设计逻辑代码。</p>
+<p>若使用 <code>FXML</code> 文件时，如：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">HBox</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">TextField</span> <span class="attr">fx:id</span>=<span class="string">"textField"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">Button</span> <span class="attr">fx:id</span>=<span class="string">"button"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">HBox</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>此时 <code>HBox</code> 的 Controller 定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyComponent</span> <span class="keyword">extends</span> <span class="title">HBox</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@FXML</span></div><div class="line">    <span class="keyword">private</span> TextField textField ;</div><div class="line"></div><div class="line">    <span class="meta">@FXML</span></div><div class="line">    <span class="keyword">private</span> Button button ;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyComponent</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            FXMLLoader loader = <span class="keyword">new</span> FXMLLoader(getClass().getResource(<span class="string">"MyComponent.fxml"</span>));</div><div class="line">            loader.setController(<span class="keyword">this</span>);</div><div class="line">            HBox hbox = loader.load();</div><div class="line">            <span class="keyword">this</span>.getChildren().add(hbox);</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException exc) &#123;</div><div class="line">            <span class="comment">// handle exception</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此时该自定义控件为一个 <code>HBox</code> 包裹一个 <code>HBox</code>，子 <code>HBox</code> 才包含 <code>TextField</code> 和 <code>Button</code>，所以无法实现开始时，纯代码方式的自定义控件设计。</p>
+<p>而使用 <code>&lt;fx:root&gt;</code> 后，可指导 Controller 类作为「根节点」，避免了 <code>HBox</code> 嵌套 <code>HBox</code> 的情况。</p>
+<p>FXML 文件设计如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">fx:root</span> <span class="attr">type</span>=<span class="string">"javafx.scene.layout.HBox"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">TextField</span> <span class="attr">fx:id</span>=<span class="string">"textField"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">Button</span> <span class="attr">fx:id</span>=<span class="string">"button"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">fx:root</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>FXML 文件同时指明了根节点的类型，资源文件对应的 Controller 设计如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyComponent</span> <span class="keyword">extends</span> <span class="title">HBox</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@FXML</span> </div><div class="line">    <span class="keyword">private</span> TextField textField ;</div><div class="line"></div><div class="line">    <span class="meta">@FXML</span></div><div class="line">    <span class="keyword">private</span> Button button ;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyComponent</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            FXMLLoader loader = <span class="keyword">new</span> FXMLLoader(getClass().getResource(<span class="string">"MyComponent.fxml"</span>));</div><div class="line">            loader.setController(<span class="keyword">this</span>);</div><div class="line">            loader.setRoot(<span class="keyword">this</span>);</div><div class="line">            loader.load();</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException exc) &#123;</div><div class="line">            <span class="comment">// handle exception</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此时可实现开始时，纯代码方式的自定义控件设计。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><p><a href="http://stackoverflow.com/questions/22000423/javafx-and-maven-nullpointerexception-location-is-required" target="_blank" rel="external">JavaFX and Maven: NullPointerException: Location is required</a></p>
+</li>
+<li><p><a href="http://stackoverflow.com/questions/23600926/how-to-understand-and-use-fxroot-in-javafx" target="_blank" rel="external">How to understand and use <code>&lt;fx:root&gt;</code>, in JavaFX</a></p>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://bitky.cc/2017/05/21/javafx/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1584,153 +1762,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/11/16/website/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="雪中亮「123lml123」">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="比特麒麟">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/11/16/website/" itemprop="url">
-                  基于 LNMP 搭建个人网站的填坑之旅
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-11-16T12:57:47+08:00">
-                2016-11-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/其他/" itemprop="url" rel="index">
-                    <span itemprop="name">其他</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>本文讨论使用 LNMP 安装包构建网站底层服务后，包括域名解析，MySQL 的管理等的一系列填坑历程。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2016/11/16/website/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1780,7 +1811,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1802,7 +1833,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-count">48</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
