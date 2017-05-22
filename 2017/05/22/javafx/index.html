@@ -58,7 +58,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Java,GUI,JavaFX,自定义控件,FXML," />
+  <meta name="keywords" content="Java,GUI,JavaFX,FXML,自定义控件," />
 
 
 
@@ -74,17 +74,17 @@
 
 
 
-<meta name="description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。 1. Maven 构建的程序未集成 FXML 布局文件使用 Maven 直接构建，在 compile 阶">
-<meta name="keywords" content="Java,GUI,JavaFX,自定义控件,FXML">
+<meta name="description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。">
+<meta name="keywords" content="Java,GUI,JavaFX,FXML,自定义控件">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Maven 集成 JavaFX 8 以及「fx:root」问题探讨">
 <meta property="og:url" content="http://bitky.cc/2017/05/22/javafx/index.html">
 <meta property="og:site_name" content="比特麒麟">
-<meta property="og:description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。 1. Maven 构建的程序未集成 FXML 布局文件使用 Maven 直接构建，在 compile 阶">
-<meta property="og:updated_time" content="2017-05-22T05:21:18.095Z">
+<meta property="og:description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。">
+<meta property="og:updated_time" content="2017-05-22T05:23:12.125Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Maven 集成 JavaFX 8 以及「fx:root」问题探讨">
-<meta name="twitter:description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。 1. Maven 构建的程序未集成 FXML 布局文件使用 Maven 直接构建，在 compile 阶">
+<meta name="twitter:description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。">
 
 
 
@@ -372,6 +372,7 @@
 
       
         <p>上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 <code>&lt;fx:root&gt;</code> 根节点问题。</p>
+<a id="more"></a>
 <h1 id="1-Maven-构建的程序未集成-FXML-布局文件"><a href="#1-Maven-构建的程序未集成-FXML-布局文件" class="headerlink" title="1. Maven 构建的程序未集成 FXML 布局文件"></a>1. Maven 构建的程序未集成 FXML 布局文件</h1><p>使用 Maven 直接构建，在 <code>compile</code> 阶段, <code>.class</code> 文件均被复制到 <code>target/classes/</code> 目录，而对于 <code>.FXML</code> 文件，则分如下情况：</p>
 <ol>
 <li><p><code>simple.fxml</code> 文件位于 <code>src/main/resources/</code> 目录中，在 <code>compile</code> 阶段，<code>simple.fxml</code> 会按照层级复制到 <code>target/classes/</code> 目录中，执行：</p>
@@ -442,9 +443,9 @@
           
             <a href="/tags/JavaFX/" rel="tag"># JavaFX</a>
           
-            <a href="/tags/自定义控件/" rel="tag"># 自定义控件</a>
-          
             <a href="/tags/FXML/" rel="tag"># FXML</a>
+          
+            <a href="/tags/自定义控件/" rel="tag"># 自定义控件</a>
           
         </div>
       
@@ -561,7 +562,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">47</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
