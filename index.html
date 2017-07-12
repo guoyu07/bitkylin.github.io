@@ -11,6 +11,19 @@
 
 
 
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
@@ -27,6 +40,10 @@
 
 
 
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
@@ -55,7 +72,7 @@
 
 <link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
   <meta name="keywords" content="Hexo, NexT" />
@@ -67,7 +84,7 @@
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
 
 
 
@@ -91,8 +108,8 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
-    fancybox: false,
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
     motion: false,
     duoshuo: {
       userId: '0',
@@ -116,26 +133,13 @@
 
 
 
-  <title> 比特麒麟 </title>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
-
+  <title>比特麒麟</title>
   
 
 
 
 
 
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?d990164c500ef11b3679defe3c7305a8";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 
 
 
@@ -145,6 +149,9 @@
 
 
 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
   
@@ -200,7 +207,7 @@
       
         
         <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
+          <a href="/categories/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
@@ -210,7 +217,7 @@
       
         
         <li class="menu-item menu-item-about">
-          <a href="/about" rel="section">
+          <a href="/about/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
             
@@ -220,7 +227,7 @@
       
         
         <li class="menu-item menu-item-archives">
-          <a href="/archives" rel="section">
+          <a href="/archives/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
@@ -230,7 +237,7 @@
       
         
         <li class="menu-item menu-item-tags">
-          <a href="/tags" rel="section">
+          <a href="/tags/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
@@ -285,16 +292,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/05/22/javafx/" itemprop="url">
-                  Maven 集成 JavaFX 8 以及「fx:root」问题探讨
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/05/22/javafx/" itemprop="url">「译」Maven 集成 JavaFX 8 以及「fx:root」问题探讨</a></h1>
         
 
         <div class="post-meta">
@@ -342,6 +341,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/05/22/javafx/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/05/22/javafx/" class="cy_cmt_count" data-xid="2017/05/22/javafx/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -356,7 +366,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -432,16 +441,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/05/21/javafx/" itemprop="url">
-                  JavaFX 8 下简化自定义控件的外部调用以及流式布局示例
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/05/21/javafx/" itemprop="url">JavaFX 8 下简化自定义控件的外部调用以及流式布局示例</a></h1>
         
 
         <div class="post-meta">
@@ -489,6 +490,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/05/21/javafx/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/05/21/javafx/" class="cy_cmt_count" data-xid="2017/05/21/javafx/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -503,7 +515,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -579,16 +590,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/05/05/netty/" itemprop="url">
-                  Netty 框架总结「ChannelHandler 及 EventLoop」
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/05/05/netty/" itemprop="url">Netty 框架总结「ChannelHandler 及 EventLoop」</a></h1>
         
 
         <div class="post-meta">
@@ -636,6 +639,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/05/05/netty/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/05/05/netty/" class="cy_cmt_count" data-xid="2017/05/05/netty/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -650,7 +664,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -726,16 +739,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/04/19/blog/" itemprop="url">
-                  加速访问基于 Github Pages 和 Hexo 的博客
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/04/19/blog/" itemprop="url">加速访问基于 Github Pages 和 Hexo 的博客</a></h1>
         
 
         <div class="post-meta">
@@ -783,6 +788,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/04/19/blog/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/04/19/blog/" class="cy_cmt_count" data-xid="2017/04/19/blog/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -797,7 +813,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -873,16 +888,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/04/17/log/" itemprop="url">
-                  SLF4J 和 Logback 在 Maven 项目中的使用方法
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/04/17/log/" itemprop="url">SLF4J 和 Logback 在 Maven 项目中的使用方法</a></h1>
         
 
         <div class="post-meta">
@@ -930,6 +937,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/04/17/log/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/04/17/log/" class="cy_cmt_count" data-xid="2017/04/17/log/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -944,7 +962,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1020,16 +1037,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/04/06/maven/" itemprop="url">
-                  Maven 常用技巧总结
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/04/06/maven/" itemprop="url">Maven 常用技巧总结</a></h1>
         
 
         <div class="post-meta">
@@ -1077,6 +1086,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/04/06/maven/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/04/06/maven/" class="cy_cmt_count" data-xid="2017/04/06/maven/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1091,7 +1111,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1167,16 +1186,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/03/26/netty/" itemprop="url">
-                  基于 Netty 的自定义帧高可靠性读取方案
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/03/26/netty/" itemprop="url">基于 Netty 的自定义帧高可靠性读取方案</a></h1>
         
 
         <div class="post-meta">
@@ -1224,6 +1235,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/03/26/netty/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/03/26/netty/" class="cy_cmt_count" data-xid="2017/03/26/netty/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1238,7 +1260,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1315,16 +1336,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/03/26/website/" itemprop="url">
-                  为你的简书和 GitHub 设定个性域名
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/03/26/website/" itemprop="url">为你的简书和 GitHub 设定个性域名</a></h1>
         
 
         <div class="post-meta">
@@ -1372,6 +1385,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/03/26/website/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/03/26/website/" class="cy_cmt_count" data-xid="2017/03/26/website/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1386,7 +1410,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1462,16 +1485,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2017/03/23/maven/" itemprop="url">
-                  使用 Maven 构建 Java 项目
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2017/03/23/maven/" itemprop="url">使用 Maven 构建 Java 项目</a></h1>
         
 
         <div class="post-meta">
@@ -1519,6 +1534,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/03/23/maven/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2017/03/23/maven/" class="cy_cmt_count" data-xid="2017/03/23/maven/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1533,7 +1559,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1611,16 +1636,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/11/18/okhttp/" itemprop="url">
-                  关于 OkHttp 依赖冲突问题的解决过程
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/11/18/okhttp/" itemprop="url">关于 OkHttp 依赖冲突问题的解决过程</a></h1>
         
 
         <div class="post-meta">
@@ -1668,6 +1685,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/11/18/okhttp/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/11/18/okhttp/" class="cy_cmt_count" data-xid="2016/11/18/okhttp/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1682,7 +1710,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1759,6 +1786,7 @@
   </div>
 
   <aside id="sidebar" class="sidebar">
+    <div id="sidebar-dimmer"></div>
     <div class="sidebar-inner">
 
       
@@ -1779,7 +1807,7 @@
 
           
             <div class="site-state-item site-state-posts">
-              <a href="/archives">
+              <a href="/archives/">
                 <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">日志</span>
               </a>
@@ -1814,6 +1842,15 @@
 
         <div class="links-of-author motion-element">
           
+            
+              <span class="links-of-author-item">
+                <a href="站点" target="_blank" title="LinkLabel">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkLabel
+                </a>
+              </span>
             
               <span class="links-of-author-item">
                 <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
@@ -1951,6 +1988,14 @@
 
 
 
+  
+
+
+
+
+
+
+
 
 
 
@@ -1971,32 +2016,39 @@
   
   <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
 
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
 
   
 
 
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
 
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
-
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
 
 
 
   
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+  
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
 
 
 
@@ -2015,22 +2067,6 @@
 
 
   
-    
-    <script>
-      var cloudTieConfig = {
-        url: document.location.href, 
-        sourceId: "",
-        productKey: "5178499c967d4c549637abc4a929a2d6",
-        target: "cloud-tie-wrapper"
-      };
-    </script>
-    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
-  
-
-
-
-
-
 
 
 
@@ -2041,6 +2077,21 @@
 
 
 
+  
+    <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cyt6NaCm6"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
 
   
 

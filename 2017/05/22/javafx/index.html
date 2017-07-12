@@ -11,6 +11,19 @@
 
 
 
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
@@ -27,6 +40,10 @@
 
 
 
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
@@ -55,7 +72,7 @@
 
 <link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
   <meta name="keywords" content="Java,GUI,JavaFX,FXML,自定义控件," />
@@ -67,7 +84,7 @@
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
 
 
 
@@ -77,13 +94,13 @@
 <meta name="description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。">
 <meta name="keywords" content="Java,GUI,JavaFX,FXML,自定义控件">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Maven 集成 JavaFX 8 以及「fx:root」问题探讨">
+<meta property="og:title" content="「译」Maven 集成 JavaFX 8 以及「fx:root」问题探讨">
 <meta property="og:url" content="http://bitky.cc/2017/05/22/javafx/index.html">
 <meta property="og:site_name" content="比特麒麟">
 <meta property="og:description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。">
-<meta property="og:updated_time" content="2017-05-22T05:23:12.125Z">
+<meta property="og:updated_time" content="2017-05-22T05:29:59.951Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Maven 集成 JavaFX 8 以及「fx:root」问题探讨">
+<meta name="twitter:title" content="「译」Maven 集成 JavaFX 8 以及「fx:root」问题探讨">
 <meta name="twitter:description" content="上一篇文章探讨了使用 IntelliJ IDEA 创建 JavaFX 工程，进而开发了所需应用程序。更实际的情况是需要使用 Maven, Gradle 等进行项目的构建。本文探讨使用 Maven 构建集成 JavaFX 8 的可执行程序的方法，以及 &amp;lt;fx:root&amp;gt; 根节点问题。">
 
 
@@ -93,8 +110,8 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
-    fancybox: false,
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
     motion: false,
     duoshuo: {
       userId: '0',
@@ -118,26 +135,13 @@
 
 
 
-  <title> Maven 集成 JavaFX 8 以及「fx:root」问题探讨 | 比特麒麟 </title>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
-
+  <title>「译」Maven 集成 JavaFX 8 以及「fx:root」问题探讨 | 比特麒麟</title>
   
 
 
 
 
 
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?d990164c500ef11b3679defe3c7305a8";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 
 
 
@@ -147,6 +151,9 @@
 
 
 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
   
@@ -200,7 +207,7 @@
       
         
         <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
+          <a href="/categories/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
@@ -210,7 +217,7 @@
       
         
         <li class="menu-item menu-item-about">
-          <a href="/about" rel="section">
+          <a href="/about/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
             
@@ -220,7 +227,7 @@
       
         
         <li class="menu-item menu-item-archives">
-          <a href="/archives" rel="section">
+          <a href="/archives/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
@@ -230,7 +237,7 @@
       
         
         <li class="menu-item menu-item-tags">
-          <a href="/tags" rel="section">
+          <a href="/tags/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
@@ -284,14 +291,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                Maven 集成 JavaFX 8 以及「fx:root」问题探讨
-              
-            
-          </h1>
+          <h1 class="post-title" itemprop="name headline">「译」Maven 集成 JavaFX 8 以及「fx:root」问题探讨</h1>
         
 
         <div class="post-meta">
@@ -340,14 +340,15 @@
           
             
               <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a class="cloud-tie-join-count" href="/2017/05/22/javafx/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
-                </a>
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
               </span>
+              
+                <a href="/2017/05/22/javafx/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2017/05/22/javafx/" itemprop="commentsCount"></span>
+                </a>
+              
             
           
 
@@ -363,7 +364,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -402,7 +402,7 @@
 <p>FXML 文件同时指明了根节点的类型，资源文件对应的 Controller 设计如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyComponent</span> <span class="keyword">extends</span> <span class="title">HBox</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@FXML</span> </div><div class="line">    <span class="keyword">private</span> TextField textField ;</div><div class="line"></div><div class="line">    <span class="meta">@FXML</span></div><div class="line">    <span class="keyword">private</span> Button button ;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyComponent</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            FXMLLoader loader = <span class="keyword">new</span> FXMLLoader(getClass().getResource(<span class="string">"MyComponent.fxml"</span>));</div><div class="line">            loader.setController(<span class="keyword">this</span>);</div><div class="line">            loader.setRoot(<span class="keyword">this</span>);</div><div class="line">            loader.load();</div><div class="line">        &#125; <span class="keyword">catch</span> (IOException exc) &#123;</div><div class="line">            <span class="comment">// handle exception</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>此时可实现开始时，纯代码方式的自定义控件设计。</p>
-<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<h1 id="3-参考资料"><a href="#3-参考资料" class="headerlink" title="3. 参考资料"></a>3. 参考资料</h1><ol>
 <li><p><a href="http://stackoverflow.com/questions/22000423/javafx-and-maven-nullpointerexception-location-is-required" target="_blank" rel="external">JavaFX and Maven: NullPointerException: Location is required</a></p>
 </li>
 <li><p><a href="http://stackoverflow.com/questions/23600926/how-to-understand-and-use-fxroot-in-javafx" target="_blank" rel="external">How to understand and use <code>&lt;fx:root&gt;</code>, in JavaFX</a></p>
@@ -451,7 +451,7 @@
       
 
       
-        
+      
       
 
       
@@ -492,7 +492,7 @@
           
   <div class="comments" id="comments">
     
-      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+      <div id="SOHUCS"></div>
     
   </div>
 
@@ -510,6 +510,7 @@
   </div>
 
   <aside id="sidebar" class="sidebar">
+    <div id="sidebar-dimmer"></div>
     <div class="sidebar-inner">
 
       
@@ -539,7 +540,7 @@
 
           
             <div class="site-state-item site-state-posts">
-              <a href="/archives">
+              <a href="/archives/">
                 <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">日志</span>
               </a>
@@ -574,6 +575,15 @@
 
         <div class="links-of-author motion-element">
           
+            
+              <span class="links-of-author-item">
+                <a href="站点" target="_blank" title="LinkLabel">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkLabel
+                </a>
+              </span>
             
               <span class="links-of-author-item">
                 <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
@@ -653,7 +663,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Maven-构建的程序未集成-FXML-布局文件"><span class="nav-number">1.</span> <span class="nav-text">1. Maven 构建的程序未集成 FXML 布局文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-FXML-文件中，「fx-root」根节点问题探讨"><span class="nav-number">2.</span> <span class="nav-text">2. FXML 文件中，「fx:root」根节点问题探讨</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Maven-构建的程序未集成-FXML-布局文件"><span class="nav-number">1.</span> <span class="nav-text">1. Maven 构建的程序未集成 FXML 布局文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-FXML-文件中，「fx-root」根节点问题探讨"><span class="nav-number">2.</span> <span class="nav-text">2. FXML 文件中，「fx:root」根节点问题探讨</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-参考资料"><span class="nav-number">3.</span> <span class="nav-text">3. 参考资料</span></a></li></ol></div>
             
 
           </div>
@@ -727,6 +737,14 @@
 
 
 
+  
+
+
+
+
+
+
+
 
 
 
@@ -747,36 +765,39 @@
   
   <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
 
-
   
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
-
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
-
-
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
-
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
 
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
 
 
 
@@ -795,24 +816,30 @@
 
 
   
-    
-    <script>
-      var cloudTieConfig = {
-        url: document.location.href, 
-        sourceId: "",
-        productKey: "5178499c967d4c549637abc4a929a2d6",
-        target: "cloud-tie-wrapper"
-      };
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt6NaCm6';
+      var conf = '169f96db2b44901e88feead8f02cb7ed';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
     </script>
-    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
   
-
-
-
-
-
-
-
 
 
 
@@ -821,6 +848,10 @@
 
 
 
+
+  
+
+  
 
   
 

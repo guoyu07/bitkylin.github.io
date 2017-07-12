@@ -11,6 +11,19 @@
 
 
 
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
 
@@ -27,6 +40,10 @@
 
 
 
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
@@ -55,7 +72,7 @@
 
 <link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
 
 
   <meta name="keywords" content="Hexo, NexT" />
@@ -67,7 +84,7 @@
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
 
 
 
@@ -91,8 +108,8 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false},
-    fancybox: false,
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
     motion: false,
     duoshuo: {
       userId: '0',
@@ -116,26 +133,13 @@
 
 
 
-  <title> 比特麒麟 </title>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
-
+  <title>比特麒麟</title>
   
 
 
 
 
 
-  <script type="text/javascript">
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?d990164c500ef11b3679defe3c7305a8";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 
 
 
@@ -145,6 +149,9 @@
 
 
 
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
   
@@ -200,7 +207,7 @@
       
         
         <li class="menu-item menu-item-categories">
-          <a href="/categories" rel="section">
+          <a href="/categories/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
@@ -210,7 +217,7 @@
       
         
         <li class="menu-item menu-item-about">
-          <a href="/about" rel="section">
+          <a href="/about/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
             
@@ -220,7 +227,7 @@
       
         
         <li class="menu-item menu-item-archives">
-          <a href="/archives" rel="section">
+          <a href="/archives/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
@@ -230,7 +237,7 @@
       
         
         <li class="menu-item menu-item-tags">
-          <a href="/tags" rel="section">
+          <a href="/tags/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
@@ -285,16 +292,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/11/16/website/" itemprop="url">
-                  基于 LNMP 搭建个人网站的填坑之旅
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/11/16/website/" itemprop="url">基于 LNMP 搭建个人网站的填坑之旅</a></h1>
         
 
         <div class="post-meta">
@@ -342,6 +341,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/11/16/website/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/11/16/website/" class="cy_cmt_count" data-xid="2016/11/16/website/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -356,7 +366,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -432,16 +441,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/11/07/wpf/" itemprop="url">
-                  基于 WPF 的酷炫 GUI 窗口的简易实现
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/11/07/wpf/" itemprop="url">基于 WPF 的酷炫 GUI 窗口的简易实现</a></h1>
         
 
         <div class="post-meta">
@@ -489,6 +490,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/11/07/wpf/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/11/07/wpf/" class="cy_cmt_count" data-xid="2016/11/07/wpf/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -503,7 +515,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -579,16 +590,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/11/06/logcat/" itemprop="url">
-                  荣耀v8 真机调试时不显示 Logcat 日志的解决办法
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/11/06/logcat/" itemprop="url">荣耀v8 真机调试时不显示 Logcat 日志的解决办法</a></h1>
         
 
         <div class="post-meta">
@@ -636,6 +639,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/11/06/logcat/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/11/06/logcat/" class="cy_cmt_count" data-xid="2016/11/06/logcat/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -650,7 +664,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -729,16 +742,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/10/12/wpf/" itemprop="url">
-                  WPF 下的自定义控件以及 Grid 中控件的自适应
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/10/12/wpf/" itemprop="url">WPF 下的自定义控件以及 Grid 中控件的自适应</a></h1>
         
 
         <div class="post-meta">
@@ -786,6 +791,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/10/12/wpf/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/10/12/wpf/" class="cy_cmt_count" data-xid="2016/10/12/wpf/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -800,7 +816,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -876,16 +891,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/09/25/sqlite/" itemprop="url">
-                  用于 C# 的 SQL 基本语法总结
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/09/25/sqlite/" itemprop="url">用于 C# 的 SQL 基本语法总结</a></h1>
         
 
         <div class="post-meta">
@@ -933,6 +940,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/09/25/sqlite/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/09/25/sqlite/" class="cy_cmt_count" data-xid="2016/09/25/sqlite/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -947,7 +965,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1023,16 +1040,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/09/12/mysql/" itemprop="url">
-                  MySQL 数据库的自动备份操作
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/09/12/mysql/" itemprop="url">MySQL 数据库的自动备份操作</a></h1>
         
 
         <div class="post-meta">
@@ -1080,6 +1089,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/09/12/mysql/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/09/12/mysql/" class="cy_cmt_count" data-xid="2016/09/12/mysql/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1094,7 +1114,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1170,16 +1189,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/07/04/openvpn/" itemprop="url">
-                  使用 OpenVPN 搭建虚拟专用网络
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/07/04/openvpn/" itemprop="url">使用 OpenVPN 搭建虚拟专用网络</a></h1>
         
 
         <div class="post-meta">
@@ -1227,6 +1238,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/07/04/openvpn/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/07/04/openvpn/" class="cy_cmt_count" data-xid="2016/07/04/openvpn/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1241,7 +1263,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1317,16 +1338,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/06/11/android/" itemprop="url">
-                  Android Studio 第三方库的导入「以 Volley 为例」
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/06/11/android/" itemprop="url">Android Studio 第三方库的导入「以 Volley 为例」</a></h1>
         
 
         <div class="post-meta">
@@ -1374,6 +1387,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/06/11/android/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/06/11/android/" class="cy_cmt_count" data-xid="2016/06/11/android/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1388,7 +1412,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1467,16 +1490,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/06/04/qt/" itemprop="url">
-                  Qt 程序在 Windows 下的发布
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/06/04/qt/" itemprop="url">Qt 程序在 Windows 下的发布</a></h1>
         
 
         <div class="post-meta">
@@ -1524,6 +1539,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/06/04/qt/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/06/04/qt/" class="cy_cmt_count" data-xid="2016/06/04/qt/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1538,7 +1564,6 @@
         </div>
       </header>
     
-
 
     <div class="post-body" itemprop="articleBody">
 
@@ -1596,7 +1621,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/04/15/location/">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2016/04/15/device/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="雪中亮「123lml123」">
@@ -1614,16 +1639,8 @@
         
         
           <h1 class="post-title" itemprop="name headline">
-            
-            
-              
                 
-                <a class="post-title-link" href="/2016/04/15/location/" itemprop="url">
-                  「转」电子地图坐标系统研究整理
-                </a>
-              
-            
-          </h1>
+                <a class="post-title-link" href="/2016/04/15/device/" itemprop="url">「转」识别独立安卓设备</a></h1>
         
 
         <div class="post-meta">
@@ -1671,6 +1688,17 @@
 
           
             
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2016/04/15/device/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://bitky.cc/2016/04/15/device/" class="cy_cmt_count" data-xid="2016/04/15/device/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
           
 
           
@@ -1686,7 +1714,6 @@
       </header>
     
 
-
     <div class="post-body" itemprop="articleBody">
 
       
@@ -1694,12 +1721,13 @@
 
       
         
-          <blockquote>
-<p>电子地图坐标系统研究整理总汇。</p>
+          <p>通过生成唯一的识别码，识别独立的安卓手机的几种方法</p>
+<blockquote>
+<p><strong>本文转载自</strong>：<a href="http://www.hawkwithwind.net/blog/2013/04/24/%E9%9A%BE%E9%A2%98%EF%BC%9A%E8%AF%86%E5%88%AB%E7%8B%AC%E7%AB%8B%E5%AE%89%E5%8D%93%E8%AE%BE%E5%A4%87/">难题：识别独立安卓设备 - 「A WING BY WIND」</a></p>
 </blockquote>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2016/04/15/location/#more" rel="contents">
+            <a class="btn" href="/2016/04/15/device/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1764,6 +1792,7 @@
   </div>
 
   <aside id="sidebar" class="sidebar">
+    <div id="sidebar-dimmer"></div>
     <div class="sidebar-inner">
 
       
@@ -1784,7 +1813,7 @@
 
           
             <div class="site-state-item site-state-posts">
-              <a href="/archives">
+              <a href="/archives/">
                 <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">日志</span>
               </a>
@@ -1819,6 +1848,15 @@
 
         <div class="links-of-author motion-element">
           
+            
+              <span class="links-of-author-item">
+                <a href="站点" target="_blank" title="LinkLabel">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  LinkLabel
+                </a>
+              </span>
             
               <span class="links-of-author-item">
                 <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
@@ -1956,6 +1994,14 @@
 
 
 
+  
+
+
+
+
+
+
+
 
 
 
@@ -1976,32 +2022,39 @@
   
   <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
 
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
 
   
 
 
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
 
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
-
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
 
 
 
   
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+  
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
 
 
 
@@ -2020,22 +2073,6 @@
 
 
   
-    
-    <script>
-      var cloudTieConfig = {
-        url: document.location.href, 
-        sourceId: "",
-        productKey: "5178499c967d4c549637abc4a929a2d6",
-        target: "cloud-tie-wrapper"
-      };
-    </script>
-    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
-  
-
-
-
-
-
 
 
 
@@ -2046,6 +2083,21 @@
 
 
 
+  
+    <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cyt6NaCm6"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
 
   
 
