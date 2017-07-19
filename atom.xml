@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://bitky.cc/"/>
-  <updated>2017-05-22T05:29:59.951Z</updated>
+  <updated>2017-07-19T08:34:33.482Z</updated>
   <id>http://bitky.cc/</id>
   
   <author>
@@ -14,6 +14,99 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>基于 Netty 的帧调度策略，自行实现流量控制及可靠性通信</title>
+    <link href="http://bitky.cc/2017/07/19/java/"/>
+    <id>http://bitky.cc/2017/07/19/java/</id>
+    <published>2017-07-19T09:00:00.000Z</published>
+    <updated>2017-07-19T08:34:33.482Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近正在做一个 Java 后端项目「大规模集群设备的管理平台」。使用 Spring 作为基础框架，使用 Netty 搭建 TCP 服务器与<strong>上万台设备</strong>组成的集群通信，使用基于 JavaFX 的图形界面应用程序模拟上万台设备的行为，并可对服务器进行压力测试。</p>
+<p>Java 服务器中，由于众多硬件设备的<strong>数据帧处理能力较差</strong>，<strong>可靠性较差</strong>，所以在 Netty 模块中使用的帧调度算法。服务器大规模下发数据帧时，可进行有效的<strong>拥塞控制、超时重发</strong>，可有效提升集群设备的可靠性，降低集群设备的研发难度。</p>
+<a id="more"></a>
+<blockquote>
+<p>本项目的基础实现架构已开源，访问以下地址获取：<br>「GitHub」<a href="https://github.com/bitkylin/ClusterDeviceControlPlatform" target="_blank" rel="external">https://github.com/bitkylin/ClusterDeviceControlPlatform</a></p>
+</blockquote>
+<h2 id="1-Netty-模块和大规模集群设备通信遇到的问题"><a href="#1-Netty-模块和大规模集群设备通信遇到的问题" class="headerlink" title="1. Netty 模块和大规模集群设备通信遇到的问题"></a>1. Netty 模块和大规模集群设备通信遇到的问题</h2><ul>
+<li><p><strong>硬件设备的帧处理能力较差</strong>，单台设备最大处理能力为 20 帧/秒，服务器需进行流量控制，避免到达设备的处理极限。</p>
+</li>
+<li><p><strong>硬件设备的可靠性较差</strong>，偶尔会出现丢帧的情况，故虽使用 TCP 协议，服务器仍需自行保证整个通信的可靠性。</p>
+</li>
+</ul>
+<h2 id="2-帧调度策略"><a href="#2-帧调度策略" class="headerlink" title="2. 帧调度策略"></a>2. 帧调度策略</h2><p>由于这些问题，故自行制定如下帧调度策略，实践表明，该策略可最大程度上解决以上问题。</p>
+<blockquote>
+<p><strong>「注」</strong>本部分为源码「Netty服务器」部分的解释说明，需结合源码进行阅读。<br>源码从此处获取：<a href="https://github.com/bitkylin/ClusterDeviceControlPlatform" target="_blank" rel="external">「GitHub」</a></p>
+</blockquote>
+<h3 id="2-1-服务器发送-Message-指令策略"><a href="#2-1-服务器发送-Message-指令策略" class="headerlink" title="2.1 服务器发送 Message 指令策略"></a>2.1 服务器发送 Message 指令策略</h3><p>服务器 ServerTcpMessageHandler 对象首先检查链表双端队列「LinkedBlockingDeque」中待发送帧的数量，若数量大于限定数量，则将待执行指令「Message」传入时间轮进行等待，使之在预订的时间后执行。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-154490a94336ff9c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="服务器发送 Message 指令策略"></p>
+<h3 id="2-2-Message-指令执行策略"><a href="#2-2-Message-指令执行策略" class="headerlink" title="2.2 Message 指令执行策略"></a>2.2 Message 指令执行策略</h3><blockquote>
+<p>待执行的指令 Message 有两种：</p>
+<ul>
+<li>基本指令：普通帧生成指令，该指令分为以下 2 种：<ul>
+<li>复合指令：一条指令需要多个 CAN 帧才能完整表示</li>
+<li>简单指令：一条指令生成一个 CAN 帧</li>
+</ul>
+</li>
+<li>WebMsgSpecial：包含特殊执行指令，该指令均内含一条普通指令，该指令分为以下 2 种：<ul>
+<li>广播发送：发送至一组或多组设备</li>
+<li>紧急发送：将生成的 CAN 帧放置在队列首位，以便优先发送</li>
+<li>不设置检错重发：该 CAN 帧无回复，或重复发送该帧易导致设备异常</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>Netty 通道「WebMsgOutBoundHandler」接收到待执行的指令 Message，根据 Message 指令进行执行，生成 CAN 帧并被 SendableMsg 对象包裹，具体执行策略如下：</p>
+<ul>
+<li>若为基本指令：生成相对应的一个或多个 CAN 帧，并添加进入不同的 SendableMsg 对象，执行策略设为非紧急和开启检错重发机制。</li>
+<li>若为 WebMsgSpecial 指令<ul>
+<li>若为广播指令：将内含 Message 根据广播指令生成多条其他 WebMsgSpecial 指令</li>
+<li>若为其他指令：生成 CAN 帧和对应的 SendableMsg 对象的同时，将「紧急」和「检错重发」标识添加进  SendableMsg 对象</li>
+</ul>
+</li>
+</ul>
+<p>Netty 通道「WebMsgOutBoundHandler」接收到待执行的「执行通道」指令 SendableMsg，根据指令进行执行：</p>
+<h4 id="1-SendableMsg-指令执行策略"><a href="#1-SendableMsg-指令执行策略" class="headerlink" title="1) SendableMsg 指令执行策略"></a>1) SendableMsg 指令执行策略</h4><p>若为「紧急」指令，将内含的 CAN 帧放置在队列首位，以便优先发送<br>若为「不检错重发」指令，在内含的 CAN 帧被发送后，不执行「检错重发」操作<br>若为「普通」指令，执行「非紧急」操作和「检错重发」操作</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-26bf7dceb252dd5d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="检错重发操作执行策略"></p>
+<h4 id="2-检错重发操作执行策略"><a href="#2-检错重发操作执行策略" class="headerlink" title="2) 检错重发操作执行策略"></a>2) 检错重发操作执行策略</h4><p>在队列中选取首位 SendableMsg 对象，内含 CAN 帧被发送的同时，CAN 帧的「组号」、「设备号」和「功能位」组成 Key，CAN 帧作为 Value，添加进 HashMap 中，并在时间轮上设置「检错重发」策略，该策略在约定延迟时间后执行，之后在 TCP 通道发送该 CAN 帧。</p>
+<p>在约定延迟时间内，Netty 的 InBound 处理通道收到特定 CAN 帧的回复，则将特定 CAN 帧的「Key, Value」对从 HashMap 中移除。</p>
+<p>在约定时间后，执行时间轮「检错重发」策略：</p>
+<ul>
+<li>检测 HashMap 中相应 CAN 帧的「Key, Value」对：<ul>
+<li>若为空，则服务器收到该 CAN 帧的回复，该策略终止</li>
+<li>若不为空，则服务器未收到该 CAN 帧的回复，查看 SendableMsg 对象的执行次数<ul>
+<li>若次数大于 3 次，Netty 模块向 Server 模块发送设备通信故障 Message，将该设备设为异常状态。</li>
+<li>若次数小于 3 次，根据 SendableMsg 指令的内含操作重新执行。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-参考资料"><a href="#3-参考资料" class="headerlink" title="3. 参考资料"></a>3. 参考资料</h2><ol>
+<li><a href="https://github.com/bitkylin/ClusterDeviceControlPlatform" target="_blank" rel="external">本项目的「GitHub」</a></li>
+<li><a href="https://zacard.net/2016/12/02/netty-hashedwheeltimer/" target="_blank" rel="external">Netty 源码解读之时间轮算法实现-HashedWheelTimer</a></li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近正在做一个 Java 后端项目「大规模集群设备的管理平台」。使用 Spring 作为基础框架，使用 Netty 搭建 TCP 服务器与&lt;strong&gt;上万台设备&lt;/strong&gt;组成的集群通信，使用基于 JavaFX 的图形界面应用程序模拟上万台设备的行为，并可对服务器进行压力测试。&lt;/p&gt;
+&lt;p&gt;Java 服务器中，由于众多硬件设备的&lt;strong&gt;数据帧处理能力较差&lt;/strong&gt;，&lt;strong&gt;可靠性较差&lt;/strong&gt;，所以在 Netty 模块中使用的帧调度算法。服务器大规模下发数据帧时，可进行有效的&lt;strong&gt;拥塞控制、超时重发&lt;/strong&gt;，可有效提升集群设备的可靠性，降低集群设备的研发难度。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Java" scheme="http://bitky.cc/categories/Java/"/>
+    
+    
+      <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
+    
+      <category term="Netty" scheme="http://bitky.cc/tags/Netty/"/>
+    
+      <category term="Spring" scheme="http://bitky.cc/tags/Spring/"/>
+    
+      <category term="CAN" scheme="http://bitky.cc/tags/CAN/"/>
+    
+  </entry>
   
   <entry>
     <title>「译」Maven 集成 JavaFX 8 以及「fx:root」问题探讨</title>
@@ -152,9 +245,9 @@
     
       <category term="FXML" scheme="http://bitky.cc/tags/FXML/"/>
     
-      <category term="自定义控件" scheme="http://bitky.cc/tags/%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%A7%E4%BB%B6/"/>
-    
       <category term="Scene Builder" scheme="http://bitky.cc/tags/Scene-Builder/"/>
+    
+      <category term="自定义控件" scheme="http://bitky.cc/tags/%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%A7%E4%BB%B6/"/>
     
   </entry>
   
@@ -1298,9 +1391,9 @@ gradle dependencies
       <category term="C#" scheme="http://bitky.cc/categories/C/"/>
     
     
-      <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
-    
       <category term="CSharp" scheme="http://bitky.cc/tags/CSharp/"/>
+    
+      <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
     
       <category term="SQLite" scheme="http://bitky.cc/tags/SQLite/"/>
     
@@ -1338,9 +1431,9 @@ gradle dependencies
     
       <category term="Java" scheme="http://bitky.cc/tags/Java/"/>
     
-      <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
-    
       <category term="CSharp" scheme="http://bitky.cc/tags/CSharp/"/>
+    
+      <category term="MySQL" scheme="http://bitky.cc/tags/MySQL/"/>
     
       <category term="计划任务" scheme="http://bitky.cc/tags/%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1/"/>
     
@@ -1705,52 +1798,6 @@ plugins/accessible/qtaccessiblewidgets.dll
       <category term="C++" scheme="http://bitky.cc/tags/C/"/>
     
       <category term="QT" scheme="http://bitky.cc/tags/QT/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Sublime Text 3 基本配置教程</title>
-    <link href="http://bitky.cc/2016/04/15/sublime/"/>
-    <id>http://bitky.cc/2016/04/15/sublime/</id>
-    <published>2016-04-15T04:57:47.000Z</published>
-    <updated>2017-04-09T06:34:13.207Z</updated>
-    
-    <content type="html"><![CDATA[<p>以下链接是一篇很好的 Sublime Text 中文教程+配置教程</p>
-<a id="more"></a>
-<blockquote>
-<p><a href="http://lucida.me/blog/sublime-text-complete-guide/" target="_blank" rel="external">http://lucida.me/blog/sublime-text-complete-guide/</a></p>
-</blockquote>
-<h1 id="1-修改-Sublime-Text-的默认配置文件位置"><a href="#1-修改-Sublime-Text-的默认配置文件位置" class="headerlink" title="1. 修改 Sublime Text 的默认配置文件位置"></a>1. 修改 Sublime Text 的默认配置文件位置</h1><p>默认情况下安装完 Sublime Text 3 , 在第一次运行的时候 , Sublime Text 3 会在 %appdata% 目录下生成一个 Sublime Text 3 的文件夹，用于存放配置文件，以及后面安装的各种插件；为便于设置完后打包，建议将配置文件位置改到安装目录下。</p>
-<p>安装完 Sublime Text 3 后，不要直接运行找到 Sublime Text 3 的安装目录，并在该目录下新建 Data 文件夹(注意大小写)。如果已经运行了，请先在地址栏输入 %appdata% 然后删除该目录下的 Sublime Text 3 文件夹。完成这一步之后再打开 Sublime Text 3 所有的配置文件都会被生成在 Data 文件夹中了。</p>
-<blockquote>
-<p><a href="http://jingyan.baidu.com/article/6f2f55a15c89cab5b93e6cfb.html" target="_blank" rel="external">引用地址</a></p>
-</blockquote>
-<hr>
-<h1 id="2-注册SublimeText-3"><a href="#2-注册SublimeText-3" class="headerlink" title="2. 注册SublimeText 3"></a>2. 注册SublimeText 3</h1><p>打开「sublime_text.exe」-&gt; help -&gt; License，粘贴即可。<br>这个经过测试，可以使用，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">----- BEGIN LICENSE ----- </div><div class="line">Andrew Weber </div><div class="line">Single User License </div><div class="line">EA7E-855605 </div><div class="line">813A03DD 5E4AD9E6 6C0EEB94 BC99798F </div><div class="line">942194A6 02396E98 E62C9979 4BB979FE </div><div class="line">91424C9D A45400BF F6747D88 2FB88078 </div><div class="line">90F5CC94 1CDC92DC 8457107A F151657B </div><div class="line">1D22E383 A997F016 42397640 33F41CFC </div><div class="line">E1D0AE85 A0BBD039 0E9C8D55 E1B89D5D </div><div class="line">5CDB7036 E56DE1C0 EFCC0840 650CD3A6 </div><div class="line">B98FC99C 8FAC73EE D2B95564 DF450523 </div><div class="line">------ END LICENSE ------</div></pre></td></tr></table></figure></p>
-<p><strong>注意: </strong> —– BEGIN LICENSE —– 和—— END LICENSE —— 都要复制粘贴进去。</p>
-<p><a href="http://www.cnblogs.com/akwwl/p/3566445.html" target="_blank" rel="external">引用地址</a></p>
-<hr>
-<h1 id="3-Sublime-Text-3-汉化"><a href="#3-Sublime-Text-3-汉化" class="headerlink" title="3. Sublime Text 3 汉化"></a>3. Sublime Text 3 汉化</h1><p>点击 Preferences -&gt; Package Control , 然后点击 Package Control : Install Package , (第一次运行可以要几秒钟，因为要下载 Package Control 里面存在的包”花名册”），然后在弹出的命令界面，输入 Chinese , 选择 ChineseLocalization (回车或者鼠标单击)。</p>
-<p>切换语言，帮助(H) -&gt; Language -&gt; 简体中文，繁体中文，日本语，English。</p>
-<p><a href="http://jingyan.baidu.com/article/ae97a646c814ccbbfd461d24.html" target="_blank" rel="external">引用地址</a></p>
-<hr>
-<h1 id="4-最新推荐"><a href="#4-最新推荐" class="headerlink" title="4. 最新推荐"></a>4. 最新推荐</h1><p>现在推荐流风轻音制作的 Sublime Text 3 Build 3103 优化版</p>
-<ol>
-<li><a href="http://haojian138.blog.163.com/blog/static/212643110201393010438357/" target="_blank" rel="external">Sublime Text 3 Build 3103 优化版</a></li>
-<li><a href="http://haojian138.blog.163.com/" target="_blank" rel="external">流风清音的博客</a></li>
-</ol>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;以下链接是一篇很好的 Sublime Text 中文教程+配置教程&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="其他" scheme="http://bitky.cc/categories/%E5%85%B6%E4%BB%96/"/>
-    
-    
-      <category term="sublime text" scheme="http://bitky.cc/tags/sublime-text/"/>
     
   </entry>
   

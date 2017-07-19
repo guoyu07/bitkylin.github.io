@@ -1,0 +1,875 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next pisces" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Netty,Spring,CAN," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="最近正在做一个 Java 后端项目「大规模集群设备的管理平台」。使用 Spring 作为基础框架，使用 Netty 搭建 TCP 服务器与上万台设备组成的集群通信，使用基于 JavaFX 的图形界面应用程序模拟上万台设备的行为，并可对服务器进行压力测试。 Java 服务器中，由于众多硬件设备的数据帧处理能力较差，可靠性较差，所以在 Netty 模块中使用的帧调度算法。服务器大规模下发数据帧时，可进">
+<meta name="keywords" content="Java,Netty,Spring,CAN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于 Netty 的帧调度策略，自行实现流量控制及可靠性通信">
+<meta property="og:url" content="http://bitky.cc/2017/07/19/java/index.html">
+<meta property="og:site_name" content="比特麒麟">
+<meta property="og:description" content="最近正在做一个 Java 后端项目「大规模集群设备的管理平台」。使用 Spring 作为基础框架，使用 Netty 搭建 TCP 服务器与上万台设备组成的集群通信，使用基于 JavaFX 的图形界面应用程序模拟上万台设备的行为，并可对服务器进行压力测试。 Java 服务器中，由于众多硬件设备的数据帧处理能力较差，可靠性较差，所以在 Netty 模块中使用的帧调度算法。服务器大规模下发数据帧时，可进">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-154490a94336ff9c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1555570-26bf7dceb252dd5d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-07-19T08:34:33.482Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于 Netty 的帧调度策略，自行实现流量控制及可靠性通信">
+<meta name="twitter:description" content="最近正在做一个 Java 后端项目「大规模集群设备的管理平台」。使用 Spring 作为基础框架，使用 Netty 搭建 TCP 服务器与上万台设备组成的集群通信，使用基于 JavaFX 的图形界面应用程序模拟上万台设备的行为，并可对服务器进行压力测试。 Java 服务器中，由于众多硬件设备的数据帧处理能力较差，可靠性较差，所以在 Netty 模块中使用的帧调度算法。服务器大规模下发数据帧时，可进">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1555570-154490a94336ff9c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":true,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://bitky.cc/2017/07/19/java/"/>
+
+
+
+
+
+  <title>基于 Netty 的帧调度策略，自行实现流量控制及可靠性通信 | 比特麒麟</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">比特麒麟</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">https://github.com/bitkylin</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://bitky.cc/2017/07/19/java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="雪中亮「123lml123」">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="比特麒麟">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于 Netty 的帧调度策略，自行实现流量控制及可靠性通信</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-19T17:00:00+08:00">
+                2017-07-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/07/19/java/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2017/07/19/java/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近正在做一个 Java 后端项目「大规模集群设备的管理平台」。使用 Spring 作为基础框架，使用 Netty 搭建 TCP 服务器与<strong>上万台设备</strong>组成的集群通信，使用基于 JavaFX 的图形界面应用程序模拟上万台设备的行为，并可对服务器进行压力测试。</p>
+<p>Java 服务器中，由于众多硬件设备的<strong>数据帧处理能力较差</strong>，<strong>可靠性较差</strong>，所以在 Netty 模块中使用的帧调度算法。服务器大规模下发数据帧时，可进行有效的<strong>拥塞控制、超时重发</strong>，可有效提升集群设备的可靠性，降低集群设备的研发难度。</p>
+<a id="more"></a>
+<blockquote>
+<p>本项目的基础实现架构已开源，访问以下地址获取：<br>「GitHub」<a href="https://github.com/bitkylin/ClusterDeviceControlPlatform" target="_blank" rel="external">https://github.com/bitkylin/ClusterDeviceControlPlatform</a></p>
+</blockquote>
+<h2 id="1-Netty-模块和大规模集群设备通信遇到的问题"><a href="#1-Netty-模块和大规模集群设备通信遇到的问题" class="headerlink" title="1. Netty 模块和大规模集群设备通信遇到的问题"></a>1. Netty 模块和大规模集群设备通信遇到的问题</h2><ul>
+<li><p><strong>硬件设备的帧处理能力较差</strong>，单台设备最大处理能力为 20 帧/秒，服务器需进行流量控制，避免到达设备的处理极限。</p>
+</li>
+<li><p><strong>硬件设备的可靠性较差</strong>，偶尔会出现丢帧的情况，故虽使用 TCP 协议，服务器仍需自行保证整个通信的可靠性。</p>
+</li>
+</ul>
+<h2 id="2-帧调度策略"><a href="#2-帧调度策略" class="headerlink" title="2. 帧调度策略"></a>2. 帧调度策略</h2><p>由于这些问题，故自行制定如下帧调度策略，实践表明，该策略可最大程度上解决以上问题。</p>
+<blockquote>
+<p><strong>「注」</strong>本部分为源码「Netty服务器」部分的解释说明，需结合源码进行阅读。<br>源码从此处获取：<a href="https://github.com/bitkylin/ClusterDeviceControlPlatform" target="_blank" rel="external">「GitHub」</a></p>
+</blockquote>
+<h3 id="2-1-服务器发送-Message-指令策略"><a href="#2-1-服务器发送-Message-指令策略" class="headerlink" title="2.1 服务器发送 Message 指令策略"></a>2.1 服务器发送 Message 指令策略</h3><p>服务器 ServerTcpMessageHandler 对象首先检查链表双端队列「LinkedBlockingDeque」中待发送帧的数量，若数量大于限定数量，则将待执行指令「Message」传入时间轮进行等待，使之在预订的时间后执行。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-154490a94336ff9c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="服务器发送 Message 指令策略"></p>
+<h3 id="2-2-Message-指令执行策略"><a href="#2-2-Message-指令执行策略" class="headerlink" title="2.2 Message 指令执行策略"></a>2.2 Message 指令执行策略</h3><blockquote>
+<p>待执行的指令 Message 有两种：</p>
+<ul>
+<li>基本指令：普通帧生成指令，该指令分为以下 2 种：<ul>
+<li>复合指令：一条指令需要多个 CAN 帧才能完整表示</li>
+<li>简单指令：一条指令生成一个 CAN 帧</li>
+</ul>
+</li>
+<li>WebMsgSpecial：包含特殊执行指令，该指令均内含一条普通指令，该指令分为以下 2 种：<ul>
+<li>广播发送：发送至一组或多组设备</li>
+<li>紧急发送：将生成的 CAN 帧放置在队列首位，以便优先发送</li>
+<li>不设置检错重发：该 CAN 帧无回复，或重复发送该帧易导致设备异常</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>Netty 通道「WebMsgOutBoundHandler」接收到待执行的指令 Message，根据 Message 指令进行执行，生成 CAN 帧并被 SendableMsg 对象包裹，具体执行策略如下：</p>
+<ul>
+<li>若为基本指令：生成相对应的一个或多个 CAN 帧，并添加进入不同的 SendableMsg 对象，执行策略设为非紧急和开启检错重发机制。</li>
+<li>若为 WebMsgSpecial 指令<ul>
+<li>若为广播指令：将内含 Message 根据广播指令生成多条其他 WebMsgSpecial 指令</li>
+<li>若为其他指令：生成 CAN 帧和对应的 SendableMsg 对象的同时，将「紧急」和「检错重发」标识添加进  SendableMsg 对象</li>
+</ul>
+</li>
+</ul>
+<p>Netty 通道「WebMsgOutBoundHandler」接收到待执行的「执行通道」指令 SendableMsg，根据指令进行执行：</p>
+<h4 id="1-SendableMsg-指令执行策略"><a href="#1-SendableMsg-指令执行策略" class="headerlink" title="1) SendableMsg 指令执行策略"></a>1) SendableMsg 指令执行策略</h4><p>若为「紧急」指令，将内含的 CAN 帧放置在队列首位，以便优先发送<br>若为「不检错重发」指令，在内含的 CAN 帧被发送后，不执行「检错重发」操作<br>若为「普通」指令，执行「非紧急」操作和「检错重发」操作</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1555570-26bf7dceb252dd5d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="检错重发操作执行策略"></p>
+<h4 id="2-检错重发操作执行策略"><a href="#2-检错重发操作执行策略" class="headerlink" title="2) 检错重发操作执行策略"></a>2) 检错重发操作执行策略</h4><p>在队列中选取首位 SendableMsg 对象，内含 CAN 帧被发送的同时，CAN 帧的「组号」、「设备号」和「功能位」组成 Key，CAN 帧作为 Value，添加进 HashMap 中，并在时间轮上设置「检错重发」策略，该策略在约定延迟时间后执行，之后在 TCP 通道发送该 CAN 帧。</p>
+<p>在约定延迟时间内，Netty 的 InBound 处理通道收到特定 CAN 帧的回复，则将特定 CAN 帧的「Key, Value」对从 HashMap 中移除。</p>
+<p>在约定时间后，执行时间轮「检错重发」策略：</p>
+<ul>
+<li>检测 HashMap 中相应 CAN 帧的「Key, Value」对：<ul>
+<li>若为空，则服务器收到该 CAN 帧的回复，该策略终止</li>
+<li>若不为空，则服务器未收到该 CAN 帧的回复，查看 SendableMsg 对象的执行次数<ul>
+<li>若次数大于 3 次，Netty 模块向 Server 模块发送设备通信故障 Message，将该设备设为异常状态。</li>
+<li>若次数小于 3 次，根据 SendableMsg 指令的内含操作重新执行。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-参考资料"><a href="#3-参考资料" class="headerlink" title="3. 参考资料"></a>3. 参考资料</h2><ol>
+<li><a href="https://github.com/bitkylin/ClusterDeviceControlPlatform" target="_blank" rel="external">本项目的「GitHub」</a></li>
+<li><a href="https://zacard.net/2016/12/02/netty-hashedwheeltimer/" target="_blank" rel="external">Netty 源码解读之时间轮算法实现-HashedWheelTimer</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Netty/" rel="tag"># Netty</a>
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+            <a href="/tags/CAN/" rel="tag"># CAN</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/22/javafx/" rel="prev" title="「译」Maven 集成 JavaFX 8 以及「fx:root」问题探讨">
+                「译」Maven 集成 JavaFX 8 以及「fx:root」问题探讨 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div id="sidebar-dimmer"></div>
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="雪中亮「123lml123」" />
+          <p class="site-author-name" itemprop="name">雪中亮「123lml123」</p>
+           
+              <p class="site-description motion-element" itemprop="description">Without the continuous bitter cold, there be no fragrant plum blossom ~ ~ 不经一番寒彻骨，怎得梅花扑鼻香。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/bitkylin" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/u/bd2e386a6ea8" target="_blank" title="简书">
+                  
+                    <i class="fa fa-fw fa-book"></i>
+                  
+                  简书
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/llmmll08" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-truck"></i>
+                  
+                  CSDN
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="/about" target="_blank" title="个人资料">
+                  
+                    <i class="fa fa-fw fa-user-circle-o"></i>
+                  
+                  个人资料
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="「ICP备案号」---" target="_blank">「ICP备案号」---</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.miitbeian.gov.cn/" title="豫ICP备16007450号" target="_blank">豫ICP备16007450号</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Netty-模块和大规模集群设备通信遇到的问题"><span class="nav-number">1.</span> <span class="nav-text">1. Netty 模块和大规模集群设备通信遇到的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-帧调度策略"><span class="nav-number">2.</span> <span class="nav-text">2. 帧调度策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-服务器发送-Message-指令策略"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 服务器发送 Message 指令策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Message-指令执行策略"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Message 指令执行策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-SendableMsg-指令执行策略"><span class="nav-number">2.2.1.</span> <span class="nav-text">1) SendableMsg 指令执行策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-检错重发操作执行策略"><span class="nav-number">2.2.2.</span> <span class="nav-text">2) 检错重发操作执行策略</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-参考资料"><span class="nav-number">3.</span> <span class="nav-text">3. 参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">雪中亮「123lml123」</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt6NaCm6';
+      var conf = '169f96db2b44901e88feead8f02cb7ed';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
