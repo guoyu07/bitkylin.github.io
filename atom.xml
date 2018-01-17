@@ -346,9 +346,9 @@
     
       <category term="FXML" scheme="http://bitky.cc/tags/FXML/"/>
     
-      <category term="自定义控件" scheme="http://bitky.cc/tags/%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%A7%E4%BB%B6/"/>
-    
       <category term="Scene Builder" scheme="http://bitky.cc/tags/Scene-Builder/"/>
+    
+      <category term="自定义控件" scheme="http://bitky.cc/tags/%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%A7%E4%BB%B6/"/>
     
   </entry>
   
@@ -601,7 +601,7 @@
     <link href="http://bitky.cc/2017/04/17/log/"/>
     <id>http://bitky.cc/2017/04/17/log/</id>
     <published>2017-04-17T14:57:47.000Z</published>
-    <updated>2017-04-17T14:43:14.168Z</updated>
+    <updated>2017-04-17T14:43:14.169Z</updated>
     
     <content type="html"><![CDATA[<p>本文介绍 SLF4J 和 Logback 在 Maven 项目中的用法，包括日志框架的依赖、使用，以及 XML 配置文件的引入。本文的精华内容翻译 Base22，文章来源见文末。</p>
 <a id="more"></a>
@@ -689,7 +689,7 @@
     <link href="http://bitky.cc/2017/04/06/maven/"/>
     <id>http://bitky.cc/2017/04/06/maven/</id>
     <published>2017-04-06T04:57:47.000Z</published>
-    <updated>2017-04-26T14:54:36.344Z</updated>
+    <updated>2017-04-26T14:54:36.345Z</updated>
     
     <content type="html"><![CDATA[<p>Maven 的常用技巧总结，包括设置 Java JDK 的版本为 JDK 1.8，构建生成可执行的 Jar，读取 resources 目录中的资源文件等。</p>
 <a id="more"></a>
@@ -779,7 +779,7 @@ target / sample-1.0.jar
     <link href="http://bitky.cc/2017/03/26/netty/"/>
     <id>http://bitky.cc/2017/03/26/netty/</id>
     <published>2017-03-26T11:57:47.000Z</published>
-    <updated>2017-05-05T09:10:35.985Z</updated>
+    <updated>2017-05-05T09:10:35.986Z</updated>
     
     <content type="html"><![CDATA[<p>本文采用 Netty 这一最流行的 Java NIO 框架，作为 Java 服务器通信部分的基础框架，探索使用一个通道、一台服务器对多个客户端提供服务。</p>
 <p>完成客户端 - 服务器通信，需要基于 TCP 协议之上，自定义一套简单的通信协议，其中数据交换方式需要使用自定义帧。为实现以上方案，本文采用 Netty 框架实现 Java 服务器的通信部分。</p>
@@ -858,7 +858,7 @@ target / sample-1.0.jar
     <link href="http://bitky.cc/2017/03/26/website/"/>
     <id>http://bitky.cc/2017/03/26/website/</id>
     <published>2017-03-26T04:57:47.000Z</published>
-    <updated>2017-07-21T07:39:32.285Z</updated>
+    <updated>2017-07-21T07:39:32.286Z</updated>
     
     <content type="html"><![CDATA[<p>为你的简书和 GitHub 设定个性的二级域名。</p>
 <a id="more"></a>
@@ -1073,7 +1073,7 @@ target / sample-1.0.jar
     <link href="http://bitky.cc/2016/11/18/okhttp/"/>
     <id>http://bitky.cc/2016/11/18/okhttp/</id>
     <published>2016-11-18T04:57:47.000Z</published>
-    <updated>2017-04-11T04:28:19.922Z</updated>
+    <updated>2017-04-11T04:28:19.923Z</updated>
     
     <content type="html"><![CDATA[<p>OkHttp 是一个流行的开源网络请求库。许多第三方库的底层都是使用 OkHttp 实现网络请求，所以 OkHttp 相关的依赖冲突问题就变得很难避免，下文是我所遇到的一次关于 OkHttp 的依赖冲突问题，通过对 Gradle 工具及 Android Studio 的灵活使用，解决了此问题。</p>
 <a id="more"></a>
@@ -1194,7 +1194,7 @@ gradle dependencies
     <link href="http://bitky.cc/2016/11/16/website/"/>
     <id>http://bitky.cc/2016/11/16/website/</id>
     <published>2016-11-16T04:57:47.000Z</published>
-    <updated>2017-04-09T06:41:52.159Z</updated>
+    <updated>2017-04-09T06:41:52.160Z</updated>
     
     <content type="html"><![CDATA[<p>本文讨论使用 LNMP 安装包构建网站底层服务后，包括域名解析，MySQL 的管理等的一系列填坑历程。</p>
 <a id="more"></a>
@@ -1272,7 +1272,7 @@ gradle dependencies
     <link href="http://bitky.cc/2016/11/07/wpf/"/>
     <id>http://bitky.cc/2016/11/07/wpf/</id>
     <published>2016-11-07T04:57:47.000Z</published>
-    <updated>2017-04-11T04:29:13.864Z</updated>
+    <updated>2017-04-11T04:29:13.865Z</updated>
     
     <content type="html"><![CDATA[<p>本文要实现基于 WPF 的酷炫 GUI 窗口，力图实现一个真正可用且实用的 GUI 窗口。</p>
 <a id="more"></a>
@@ -1344,7 +1344,7 @@ gradle dependencies
     <link href="http://bitky.cc/2016/11/06/logcat/"/>
     <id>http://bitky.cc/2016/11/06/logcat/</id>
     <published>2016-11-06T04:57:47.000Z</published>
-    <updated>2017-04-09T06:26:55.784Z</updated>
+    <updated>2017-04-09T06:26:55.785Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p><strong>「最新更新」</strong>我刚刚尝试使用荣耀v8进行调试，该手机已升级到最新版系统「基于 EMUI 5.0 + Android 7.0」，发现 LogCat 调试一切正常，已不存在该问题，请大家升级后重试。</p>
